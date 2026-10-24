@@ -148,4 +148,5 @@ export type PageId =
   | 'about'
   | 'business-plan'
   | 'team'
-  | 'contact';
+  | 'contact'
+  | 'auth';

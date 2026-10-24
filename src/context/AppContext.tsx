@@ -266,11 +266,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         cloudService.getProfile(userId),
       ]);
 
-      if (cloudWardrobe.length > 0) setWardrobe(cloudWardrobe);
-      if (cloudOutfits.length > 0) setSavedOutfits(cloudOutfits);
-      if (cloudPlans.length > 0) setOutfitPlans(cloudPlans);
-      if (cloudFavs.length > 0) setFavourites(cloudFavs);
-      if (cloudProfile) setUserProfile(cloudProfile);
+      // Strictly isolate user records: overwrite state with this user's cloud records
+      setWardrobe(cloudWardrobe);
+      setSavedOutfits(cloudOutfits);
+      setOutfitPlans(cloudPlans);
+      setFavourites(cloudFavs);
+      if (cloudProfile) {
+        setUserProfile(cloudProfile);
+      }
 
       logActivity('Synchronized user assets with Supabase Cloud', 'stylist');
     } catch (err) {
@@ -320,7 +323,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Auth Operations
   const signInWithEmail = async (email: string, pass: string) => {
     if (!supabase || !isSupabaseConfigured) {
-      return { error: 'Supabase is not configured yet. Running in local demo mode.' };
+      return { 
+        error: 'Supabase authentication is not configured. Please supply VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file to enable authentication.' 
+      };
     }
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -333,14 +338,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         email: data.user.email || '',
         fullName: data.user.user_metadata?.full_name,
       });
-      loadUserDataFromCloud(data.user.id);
+      await loadUserDataFromCloud(data.user.id);
     }
     return {};
   };
 
   const signUpWithEmail = async (email: string, pass: string, fullName?: string, migrateData = true) => {
     if (!supabase || !isSupabaseConfigured) {
-      return { error: 'Supabase is not configured yet. Running in local demo mode.' };
+      return { 
+        error: 'Supabase authentication is not configured. Please supply VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file to enable authentication.' 
+      };
     }
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -382,7 +389,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       await supabase.auth.signOut();
     }
     setCurrentUser(null);
-    showToast('Signed out. Local guest demo restored.', 'info');
+    // Securely clear private user records from memory and local cache
+    setWardrobe([]);
+    setSavedOutfits([]);
+    setOutfitPlans([]);
+    setFavourites([]);
+    localStorage.removeItem('stylesync_wardrobe');
+    localStorage.removeItem('stylesync_outfits');
+    localStorage.removeItem('stylesync_plans');
+    localStorage.removeItem('stylesync_favourites');
+    setActivePage('home');
+    showToast('Signed out successfully. Session ended.', 'info');
   };
 
   const syncLocalDataToCloud = async () => {
@@ -404,6 +421,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // NAVIGATION & TOAST
   // --------------------------------------------------------------------------
   const navigateTo = (page: PageId) => {
+    const PROTECTED_LIST: PageId[] = ['profile', 'wardrobe', 'builder', 'planner'];
+    if (!currentUser && PROTECTED_LIST.includes(page)) {
+      setActivePage('auth');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
     setActivePage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
