@@ -39,7 +39,7 @@ export const HomePage: React.FC = () => {
               </h1>
 
               <p className="text-base sm:text-lg text-[#5C5245] leading-relaxed max-w-xl font-normal">
-                StyleSync AI combines personal rule-based styling, digital wardrobe cataloging, and smart budget recommendations. Built for college students and young professionals across India who want to look confident every day without morning outfit paralysis.
+                StyleSync combines personal rule-based styling, digital wardrobe cataloging, and smart budget recommendations. Built for college students and young professionals across India who want to look confident every day without morning outfit paralysis.
               </p>
 
               <div className="pt-2 flex flex-wrap gap-4 items-center">
@@ -125,7 +125,7 @@ export const HomePage: React.FC = () => {
               Intuitive 4-Step Architecture
             </span>
             <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#1A1A1A] mt-2">
-              How StyleSync AI Works
+              How StyleSync Works
             </h2>
             <p className="text-sm text-[#7A6B5D] mt-3">
               Combining individual preferences with systematic wardrobe management to eliminate decision fatigue.
@@ -316,7 +316,7 @@ export const HomePage: React.FC = () => {
 
             <div className="lg:col-span-8 text-xs sm:text-sm text-[#5C5245] leading-relaxed space-y-2">
               <p>
-                Fast-fashion cycles create enormous textile waste and strain student budgets with impulse purchases worn only once. StyleSync AI advocates for the <strong>Capsule Wardrobe Philosophy</strong>—encouraging users to re-wear, restyle, and combine existing clothes before buying new items.
+                Fast-fashion cycles create enormous textile waste and strain student budgets with impulse purchases worn only once. StyleSync advocates for the <strong>Capsule Wardrobe Philosophy</strong>—encouraging users to re-wear, restyle, and combine existing clothes before buying new items.
               </p>
               <p className="text-xs text-[#8C7E6D]">
                 When new pieces are recommended, our scoring logic emphasizes timeless versatility and multi-occasion reusability over fleeting micro-trends.

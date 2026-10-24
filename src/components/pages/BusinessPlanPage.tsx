@@ -25,7 +25,7 @@ export const BusinessPlanPage: React.FC = () => {
           <span>Coursework Planning Framework</span>
         </div>
         <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-[#1A1A1A]">
-          StyleSync AI Business Plan
+          StyleSync Business Plan
         </h1>
         <p className="text-xs sm:text-sm text-[#6B5E50] leading-relaxed">
           Structured strictly according to the six fundamental management planning components for the Essentials of Management business project.

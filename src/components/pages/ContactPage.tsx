@@ -64,7 +64,7 @@ export const ContactPage: React.FC = () => {
           Contact & Evaluation Feedback
         </h1>
         <p className="text-xs sm:text-sm text-[#6B5E50] leading-relaxed">
-          Have observations, bug reports, or partnership ideas for StyleSync AI? Submit your thoughts below; all responses persist in LocalStorage for demo evaluation.
+          Have observations, bug reports, or partnership ideas for StyleSync? Submit your thoughts below; all responses persist in LocalStorage for demo evaluation.
         </p>
       </div>
 

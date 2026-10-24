@@ -65,17 +65,10 @@ export const Navbar: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-40 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-[#EAE4DC] transition-all">
-      {/* Top Academic & Demo Disclaimer Bar */}
-      <div className="bg-[#1A1A1A] text-[#EBE5DE] text-[11px] py-1.5 px-4 font-medium tracking-wide flex items-center justify-between">
-        <div className="hidden sm:flex items-center gap-2">
-          <span className="bg-[#C86D51] text-white text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
-            COLLEGE BUSINESS PROJECT
-          </span>
-          <span>Essentials of Management Coursework • StyleSync AI Full-Stack MVP</span>
-        </div>
-
+      {/* Top Bar with Cloud Status indicator */}
+      <div className="bg-[#1A1A1A] text-[#EBE5DE] text-[11px] py-1.5 px-4 sm:px-6 lg:px-8 font-medium tracking-wide flex items-center justify-end">
         {/* Cloud Status indicator in top bar */}
-        <div className="flex items-center gap-2 mx-auto sm:mx-0">
+        <div className="flex items-center gap-2">
           {isCloudConnected ? (
             <span className="inline-flex items-center gap-1.5 text-emerald-400 text-[10px] bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-800">
               <Cloud className="w-3 h-3 text-emerald-400" />
@@ -102,10 +95,10 @@ export const Navbar: React.FC = () => {
           </div>
           <div className="flex flex-col">
             <span className="font-serif text-2xl font-bold tracking-tight text-[#1A1A1A] leading-tight">
-              StyleSync <span className="text-[#C86D51] font-sans text-xs font-semibold uppercase tracking-widest px-1.5 py-0.5 bg-[#F5ECE4] rounded ml-0.5">AI</span>
+              StyleSync
             </span>
             <span className="text-[10px] tracking-wider text-[#8C7E6D] uppercase font-medium">
-              Your Wardrobe. Smarter Choices.
+              Your Wardrobe. Your Style. Smarter Choices.
             </span>
           </div>
         </div>

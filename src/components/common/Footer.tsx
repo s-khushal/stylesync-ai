@@ -18,7 +18,7 @@ export const Footer: React.FC = () => {
                 S
               </div>
               <span className="font-serif text-2xl font-bold tracking-tight text-white">
-                StyleSync <span className="text-[#E07A5F] font-sans text-xs uppercase px-1.5 py-0.5 bg-white/10 rounded">AI</span>
+                StyleSync
               </span>
             </div>
             <p className="text-xs text-[#A89F93] leading-relaxed max-w-sm">
@@ -104,7 +104,7 @@ export const Footer: React.FC = () => {
       <div className="border-t border-[#2D2824] bg-[#141210] py-6 px-4 text-center text-xs text-[#82786D]">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <p>
-            © 2026 StyleSync AI — Built for College Business Presentation (Essentials of Management).
+            © 2026 StyleSync — Built for College Business Presentation (Essentials of Management).
           </p>
           <div className="flex items-center gap-4 text-[11px]">
             <span>Client-Side Local Rule-Based Recommendation Engine</span>

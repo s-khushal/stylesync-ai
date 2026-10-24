@@ -88,7 +88,7 @@ export const CheckoutModal: React.FC = () => {
               {orderConfirmed ? 'Order Confirmation' : 'Demo Express Checkout'}
             </h2>
             <p className="text-xs text-[#8C7E6D]">
-              {orderConfirmed ? 'Thank you for testing the StyleSync AI flow' : 'No payment credentials will be requested or processed'}
+              {orderConfirmed ? 'Thank you for testing the StyleSync flow' : 'No payment credentials will be requested or processed'}
             </p>
           </div>
           <button

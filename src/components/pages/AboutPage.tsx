@@ -26,7 +26,7 @@ export const AboutPage: React.FC = () => {
           <span>Fashion Technology Startup</span>
         </div>
         <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-[#1A1A1A]">
-          About StyleSync AI
+          About StyleSync
         </h1>
         <p className="text-base sm:text-lg text-[#5C5245] leading-relaxed">
           "Your Wardrobe. Your Style. Smarter Choices."
@@ -110,7 +110,7 @@ export const AboutPage: React.FC = () => {
             The Digital Fashion Assistant
           </h2>
           <p className="text-xs sm:text-sm text-[#5C5245] mt-3 leading-relaxed">
-            StyleSync AI integrates personal digital wardrobe management with algorithmic outfit generation and curated commerce discovery. We treat styling as an optimization problem: maximizing aesthetic harmony and occasion appropriateness while minimizing budget expenditure and closet redundancy.
+            StyleSync integrates personal digital wardrobe management with algorithmic outfit generation and curated commerce discovery. We treat styling as an optimization problem: maximizing aesthetic harmony and occasion appropriateness while minimizing budget expenditure and closet redundancy.
           </p>
         </div>
 
