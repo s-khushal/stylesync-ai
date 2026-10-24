@@ -3,6 +3,7 @@ import { AppProvider, useApp } from './context/AppContext';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { Toast } from './components/common/Toast';
+import { AuthModal } from './components/common/AuthModal';
 import { ProductDetailModal } from './components/pages/ProductDetailModal';
 import { CartModal } from './components/pages/CartModal';
 import { CheckoutModal } from './components/pages/CheckoutModal';
@@ -21,7 +22,7 @@ import { TeamOrgPage } from './components/pages/TeamOrgPage';
 import { ContactPage } from './components/pages/ContactPage';
 
 const MainLayout: React.FC = () => {
-  const { activePage } = useApp();
+  const { activePage, isAuthModalOpen, setIsAuthModalOpen, authModalMode } = useApp();
 
   const renderActivePage = () => {
     switch (activePage) {
@@ -64,6 +65,11 @@ const MainLayout: React.FC = () => {
       <ProductDetailModal />
       <CartModal />
       <CheckoutModal />
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)} 
+        defaultMode={authModalMode}
+      />
       <Toast />
     </div>
   );

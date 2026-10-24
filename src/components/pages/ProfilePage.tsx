@@ -13,7 +13,11 @@ import {
   RotateCcw, 
   Check, 
   Sliders, 
-  ShieldAlert
+  ShieldAlert,
+  Cloud,
+  LogIn,
+  LogOut,
+  UploadCloud
 } from 'lucide-react';
 
 export const ProfilePage: React.FC = () => {
@@ -29,7 +33,12 @@ export const ProfilePage: React.FC = () => {
     products, 
     resetAllDemoData,
     showToast,
-    navigateTo 
+    navigateTo,
+    currentUser,
+    isCloudConnected,
+    setIsAuthModalOpen,
+    signOut,
+    syncLocalDataToCloud
   } = useApp();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -330,16 +339,72 @@ export const ProfilePage: React.FC = () => {
           <div className="bg-[#FAF6F0] border border-[#E8DFC8] rounded-2xl p-4 text-[11px] text-[#5C5245] space-y-1">
             <div className="flex items-center gap-1.5 font-bold text-[#8C533E]">
               <ShieldAlert className="w-3.5 h-3.5" />
-              <span>Storage Architecture Disclosure</span>
+              <span>Full-Stack Cloud & RLS Architecture</span>
             </div>
             <p className="leading-relaxed">
-              This profile runs on browser-isolated LocalStorage for demonstration purposes. In production, this would bridge to an encrypted PostgreSQL / Firebase Auth cluster with hashed tokens.
+              This application utilizes Supabase PostgreSQL with strict Row Level Security (RLS) policies and user-isolated Cloud Storage for wardrobe photographs. When running unauthenticated or offline, it safely falls back to local browser storage so evaluation is never interrupted.
             </p>
           </div>
         </div>
 
-        {/* Right: Live Activity Stream & Evaluator Reset Box */}
+        {/* Right: Cloud Sync, Live Activity Stream & Evaluator Reset Box */}
         <div className="lg:col-span-5 space-y-6">
+          {/* Supabase Cloud Account & Synchronization Card */}
+          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#EDE8E0] shadow-sm space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-[#F5F2EB]">
+              <div className="flex items-center gap-2">
+                <Cloud className={`w-4 h-4 ${currentUser ? 'text-emerald-700' : 'text-[#C86D51]'}`} />
+                <h3 className="font-serif text-lg font-bold text-[#1A1A1A]">
+                  Cloud Account & Sync
+                </h3>
+              </div>
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                currentUser ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+              }`}>
+                {currentUser ? 'Cloud Synced' : 'Guest Demo Mode'}
+              </span>
+            </div>
+
+            {currentUser ? (
+              <div className="space-y-3 text-xs">
+                <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#EAE3D8] space-y-1">
+                  <div className="text-[#8C7E6D]">Authenticated User:</div>
+                  <div className="font-bold text-[#1A1A1A]">{currentUser.email}</div>
+                  <div className="text-[10px] text-[#8C7E6D] font-mono">UID: {currentUser.id.substring(0, 18)}...</div>
+                </div>
+
+                <div className="flex flex-col gap-2 pt-1">
+                  <button
+                    onClick={syncLocalDataToCloud}
+                    className="w-full py-2.5 px-4 rounded-xl bg-[#FAF6F0] hover:bg-[#F5ECE4] text-[#8C533E] border border-[#E8DFC8] text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-sm"
+                  >
+                    <UploadCloud className="w-3.5 h-3.5 text-[#C86D51]" />
+                    <span>Sync Local Guest Items to Cloud</span>
+                  </button>
+                  <button
+                    onClick={signOut}
+                    className="w-full py-2 px-4 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>Sign Out of Supabase</span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3 text-xs text-[#5C5245]">
+                <p className="leading-relaxed">
+                  Currently running in <strong>Guest Demo Mode</strong>. Create a free Supabase cloud account to sync your wardrobe images to secure cloud storage and access your outfits across devices.
+                </p>
+                <button
+                  onClick={() => setIsAuthModalOpen(true)}
+                  className="w-full py-2.5 px-4 rounded-xl bg-[#1A1A1A] hover:bg-[#333333] text-white text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-sm"
+                >
+                  <LogIn className="w-3.5 h-3.5 text-[#E07A5F]" />
+                  <span>Sign In / Create Cloud Account</span>
+                </button>
+              </div>
+            )}
+          </div>
           {/* Recent Activity Log */}
           <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#EDE8E0] shadow-sm space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-[#F5F2EB]">

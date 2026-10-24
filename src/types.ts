@@ -56,6 +56,7 @@ export interface WardrobeItem {
   season: SeasonTag;
   tags: string[];
   image: string;
+  storagePath?: string;
   createdAt: string;
 }
 
@@ -128,6 +129,12 @@ export interface ActivityLog {
   text: string;
   timestamp: string;
   iconType: 'outfit' | 'cart' | 'wardrobe' | 'plan' | 'stylist';
+}
+
+export interface AuthUserState {
+  id: string;
+  email: string;
+  fullName?: string;
 }
 
 export type PageId = 

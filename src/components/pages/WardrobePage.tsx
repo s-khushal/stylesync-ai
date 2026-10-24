@@ -17,7 +17,15 @@ import {
 } from 'lucide-react';
 
 export const WardrobePage: React.FC = () => {
-  const { wardrobe, addWardrobeItem, updateWardrobeItem, deleteWardrobeItem, showToast } = useApp();
+  const { 
+    wardrobe, 
+    addWardrobeItem, 
+    updateWardrobeItem, 
+    deleteWardrobeItem, 
+    showToast,
+    currentUser,
+    isCloudConnected 
+  } = useApp();
 
   // Filter & Search
   const [searchTerm, setSearchTerm] = useState('');
@@ -35,6 +43,7 @@ export const WardrobePage: React.FC = () => {
   const [formSeason, setFormSeason] = useState<SeasonTag>('All-Season');
   const [formTags, setFormTags] = useState('Campus, Casual');
   const [formImage, setFormImage] = useState('');
+  const [selectedUploadFile, setSelectedUploadFile] = useState<File | null>(null);
   const [imageError, setImageError] = useState('');
 
   const categories: Category[] = [
@@ -70,6 +79,7 @@ export const WardrobePage: React.FC = () => {
     setFormSeason('All-Season');
     setFormTags('Campus, Casual');
     setFormImage(samplePresets[0].url);
+    setSelectedUploadFile(null);
     setImageError('');
     setIsModalOpen(true);
   };
@@ -84,6 +94,7 @@ export const WardrobePage: React.FC = () => {
     setFormSeason(item.season);
     setFormTags(item.tags.join(', '));
     setFormImage(item.image);
+    setSelectedUploadFile(null);
     setImageError('');
     setIsModalOpen(true);
   };
@@ -93,11 +104,12 @@ export const WardrobePage: React.FC = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 2.5 * 1024 * 1024) {
-      setImageError('File size is too large (max 2.5MB allowed for localStorage safety).');
+    if (file.size > 5 * 1024 * 1024) {
+      setImageError('File size is too large (max 5MB allowed).');
       return;
     }
 
+    setSelectedUploadFile(file);
     setImageError('');
     const reader = new FileReader();
     reader.onload = (uploadEvent) => {
@@ -108,7 +120,7 @@ export const WardrobePage: React.FC = () => {
   };
 
   // Save or Update
-  const handleSaveForm = (e: React.FormEvent) => {
+  const handleSaveForm = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formName.trim()) {
       showToast('Please provide a name for your clothing item.', 'error');
@@ -123,7 +135,7 @@ export const WardrobePage: React.FC = () => {
     const tagsArray = formTags.split(',').map(t => t.trim()).filter(Boolean);
 
     if (editingItem) {
-      updateWardrobeItem({
+      await updateWardrobeItem({
         ...editingItem,
         name: formName.trim(),
         category: formCategory,
@@ -134,7 +146,7 @@ export const WardrobePage: React.FC = () => {
         image: formImage
       });
     } else {
-      addWardrobeItem({
+      await addWardrobeItem({
         name: formName.trim(),
         category: formCategory,
         slot: formSlot,
@@ -142,9 +154,10 @@ export const WardrobePage: React.FC = () => {
         season: formSeason,
         tags: tagsArray,
         image: formImage
-      });
+      }, selectedUploadFile || undefined);
     }
 
+    setSelectedUploadFile(null);
     setIsModalOpen(false);
   };
 

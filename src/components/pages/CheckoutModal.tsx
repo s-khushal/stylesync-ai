@@ -3,7 +3,16 @@ import { useApp } from '../../context/AppContext';
 import { X, CheckCircle2, ShieldCheck, ShoppingBag, ArrowRight } from 'lucide-react';
 
 export const CheckoutModal: React.FC = () => {
-  const { isCheckoutOpen, setIsCheckoutOpen, cart, cartSubtotal, clearCart, showToast, navigateTo } = useApp();
+  const { 
+    isCheckoutOpen, 
+    setIsCheckoutOpen, 
+    cart, 
+    cartSubtotal, 
+    clearCart, 
+    showToast, 
+    navigateTo,
+    recordCheckoutOrder 
+  } = useApp();
 
   const [formData, setFormData] = useState({
     fullName: 'Aanya Sharma',
@@ -43,6 +52,20 @@ export const CheckoutModal: React.FC = () => {
     const demoOrderId = `SSAI-${Math.floor(100000 + Math.random() * 900000)}`;
     setConfirmedOrderId(demoOrderId);
     setOrderConfirmed(true);
+
+    recordCheckoutOrder({
+      orderNumber: demoOrderId,
+      fullName: formData.fullName,
+      email: formData.email,
+      phone: formData.phone,
+      address: formData.address,
+      city: formData.city,
+      pinCode: formData.pinCode,
+      paymentMethod: formData.paymentMethod,
+      items: cart,
+      totalAmount: cartSubtotal,
+    });
+
     clearCart();
     showToast(`Order #${demoOrderId} placed successfully!`, 'success');
   };

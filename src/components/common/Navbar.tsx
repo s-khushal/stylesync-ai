@@ -15,18 +15,35 @@ import {
   Briefcase, 
   Users, 
   Info, 
-  MessageSquare
+  MessageSquare,
+  Cloud,
+  LogOut,
+  LogIn
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
-  const { activePage, navigateTo, cartCount, favourites, setIsCartOpen } = useApp();
+  const { 
+    activePage, 
+    navigateTo, 
+    cartCount, 
+    favourites, 
+    setIsCartOpen,
+    currentUser,
+    isCloudConnected,
+    setIsAuthModalOpen,
+    setAuthModalMode,
+    signOut
+  } = useApp();
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [businessDropdownOpen, setBusinessDropdownOpen] = useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
   const handleNav = (page: PageId) => {
     navigateTo(page);
     setMobileMenuOpen(false);
     setBusinessDropdownOpen(false);
+    setUserDropdownOpen(false);
   };
 
   const navLinks: { label: string; page: PageId; icon: React.ReactNode }[] = [
@@ -49,15 +66,27 @@ export const Navbar: React.FC = () => {
   return (
     <header className="sticky top-0 z-40 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-[#EAE4DC] transition-all">
       {/* Top Academic & Demo Disclaimer Bar */}
-      <div className="bg-[#1A1A1A] text-[#EBE5DE] text-[11px] py-1.5 px-4 text-center font-medium tracking-wide flex items-center justify-between">
-        <div className="hidden sm:flex items-center gap-2 mx-auto">
+      <div className="bg-[#1A1A1A] text-[#EBE5DE] text-[11px] py-1.5 px-4 font-medium tracking-wide flex items-center justify-between">
+        <div className="hidden sm:flex items-center gap-2">
           <span className="bg-[#C86D51] text-white text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
             COLLEGE BUSINESS PROJECT
           </span>
-          <span>Essentials of Management Coursework • Live Interactive MVP Demonstration</span>
+          <span>Essentials of Management Coursework • StyleSync AI Full-Stack MVP</span>
         </div>
-        <div className="sm:hidden text-center w-full">
-          <span>Essentials of Management • StyleSync AI MVP</span>
+
+        {/* Cloud Status indicator in top bar */}
+        <div className="flex items-center gap-2 mx-auto sm:mx-0">
+          {isCloudConnected ? (
+            <span className="inline-flex items-center gap-1.5 text-emerald-400 text-[10px] bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-800">
+              <Cloud className="w-3 h-3 text-emerald-400" />
+              <span>Supabase Cloud Connected</span>
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 text-amber-300 text-[10px] bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-800">
+              <Cloud className="w-3 h-3 text-amber-400" />
+              <span>Local Demo Mode (Guest)</span>
+            </span>
+          )}
         </div>
       </div>
 
@@ -143,7 +172,7 @@ export const Navbar: React.FC = () => {
           </div>
         </nav>
 
-        {/* Right Action Icons (Favourites, Cart, Profile, Mobile Menu) */}
+        {/* Right Action Icons (Favourites, Cart, Profile/Auth, Mobile Menu) */}
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Favourites */}
           <button
@@ -173,7 +202,63 @@ export const Navbar: React.FC = () => {
             </span>
           </button>
 
-          {/* Profile / Dashboard */}
+          {/* Authentication & User Dropdown */}
+          {currentUser ? (
+            <div className="relative">
+              <button
+                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                className="flex items-center gap-2 py-1.5 px-3 rounded-xl bg-[#FAF6F0] hover:bg-[#F3ECE4] border border-[#E2DAD0] text-[#1A1A1A] transition-all text-xs font-semibold"
+              >
+                <div className="w-6 h-6 rounded-full bg-[#1A1A1A] text-white flex items-center justify-center text-[10px] font-bold">
+                  {currentUser.fullName?.charAt(0) || currentUser.email.charAt(0).toUpperCase()}
+                </div>
+                <span className="hidden md:inline max-w-[100px] truncate">
+                  {currentUser.fullName || currentUser.email.split('@')[0]}
+                </span>
+                <ChevronDown className="w-3 h-3 text-[#8C7E6D]" />
+              </button>
+
+              {userDropdownOpen && (
+                <div 
+                  className="absolute top-full right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-[#EDE8E0] p-2 z-50 animate-in fade-in slide-in-from-top-2"
+                  onMouseLeave={() => setUserDropdownOpen(false)}
+                >
+                  <div className="px-3 py-2 border-b border-[#F5F2EB]">
+                    <p className="text-xs font-bold text-[#1A1A1A] truncate">{currentUser.fullName || 'User'}</p>
+                    <p className="text-[10px] text-[#8C7E6D] truncate">{currentUser.email}</p>
+                  </div>
+                  <button
+                    onClick={() => handleNav('profile')}
+                    className="w-full text-left px-3 py-2 text-xs text-[#4A4237] hover:bg-[#FAF8F5] rounded-xl flex items-center gap-2 mt-1"
+                  >
+                    <User className="w-4 h-4 text-[#C86D51]" /> Dashboard & Profile
+                  </button>
+                  <button
+                    onClick={() => {
+                      signOut();
+                      setUserDropdownOpen(false);
+                    }}
+                    className="w-full text-left px-3 py-2 text-xs text-rose-600 hover:bg-rose-50 rounded-xl flex items-center gap-2 mt-1"
+                  >
+                    <LogOut className="w-4 h-4" /> Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={() => {
+                setAuthModalMode('signin');
+                setIsAuthModalOpen(true);
+              }}
+              className="hidden sm:flex items-center gap-1.5 py-2 px-3 rounded-xl border border-[#DDD5CB] hover:bg-[#FAF8F5] text-[#1A1A1A] text-xs font-semibold transition-all shadow-sm"
+            >
+              <LogIn className="w-3.5 h-3.5 text-[#C86D51]" />
+              <span>Sign In</span>
+            </button>
+          )}
+
+          {/* Profile Quick Link */}
           <button
             onClick={() => handleNav('profile')}
             aria-label="User Profile"
@@ -201,6 +286,42 @@ export const Navbar: React.FC = () => {
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div className="lg:hidden bg-[#FAF8F5] border-b border-[#E0D7CC] px-4 pt-2 pb-6 max-h-[85vh] overflow-y-auto shadow-2xl">
+          {/* Auth Bar inside Mobile menu */}
+          <div className="p-3 mb-3 bg-white rounded-2xl border border-[#EAE3D8] flex items-center justify-between">
+            {currentUser ? (
+              <div className="flex items-center justify-between w-full">
+                <div>
+                  <p className="text-xs font-bold text-[#1A1A1A]">{currentUser.fullName || currentUser.email}</p>
+                  <p className="text-[10px] text-emerald-700 flex items-center gap-1">
+                    <Cloud className="w-3 h-3" /> Cloud Synced
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    signOut();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="text-xs font-semibold text-rose-600 px-3 py-1.5 rounded-xl border border-rose-200"
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between w-full">
+                <span className="text-xs text-[#6B5E50]">Guest / Local Demo Mode</span>
+                <button
+                  onClick={() => {
+                    setIsAuthModalOpen(true);
+                    setMobileMenuOpen(false);
+                  }}
+                  className="text-xs font-semibold bg-[#1A1A1A] text-white px-3 py-1.5 rounded-xl flex items-center gap-1.5"
+                >
+                  <LogIn className="w-3.5 h-3.5" /> Sign In
+                </button>
+              </div>
+            )}
+          </div>
+
           <div className="space-y-1 mb-4">
             <div className="px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[#8C7E6D]">
               Platform Navigation

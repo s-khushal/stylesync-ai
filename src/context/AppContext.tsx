@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { 
   Product, 
   WardrobeItem, 
@@ -8,12 +8,15 @@ import {
   UserProfile, 
   FeedbackSubmission, 
   ActivityLog, 
+  AuthUserState,
   PageId 
 } from '../types';
 import { INITIAL_PRODUCTS } from '../data/products';
 import { INITIAL_WARDROBE } from '../data/initialWardrobe';
 import { INITIAL_OUTFITS } from '../data/initialOutfits';
 import { INITIAL_PLANS } from '../data/initialPlans';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { cloudService } from '../services/cloudService';
 
 const DEFAULT_PROFILE: UserProfile = {
   name: 'Aanya Sharma',
@@ -38,29 +41,42 @@ interface AppContextType {
   isCheckoutOpen: boolean;
   setIsCheckoutOpen: (open: boolean) => void;
 
+  // Authentication & Cloud State
+  currentUser: AuthUserState | null;
+  isAuthLoading: boolean;
+  isCloudConnected: boolean;
+  isAuthModalOpen: boolean;
+  setIsAuthModalOpen: (open: boolean) => void;
+  authModalMode: 'signin' | 'signup';
+  setAuthModalMode: (mode: 'signin' | 'signup') => void;
+  signInWithEmail: (email: string, pass: string) => Promise<{ error?: string }>;
+  signUpWithEmail: (email: string, pass: string, fullName?: string, migrateData?: boolean) => Promise<{ error?: string; message?: string }>;
+  signOut: () => Promise<void>;
+  syncLocalDataToCloud: () => Promise<{ success: boolean; count: number }>;
+
   // Products & catalogue
   products: Product[];
 
   // Wardrobe
   wardrobe: WardrobeItem[];
-  addWardrobeItem: (item: Omit<WardrobeItem, 'id' | 'createdAt'>) => void;
-  updateWardrobeItem: (item: WardrobeItem) => void;
-  deleteWardrobeItem: (id: string) => void;
+  addWardrobeItem: (item: Omit<WardrobeItem, 'id' | 'createdAt'>, fileToUpload?: File) => Promise<void>;
+  updateWardrobeItem: (item: WardrobeItem) => Promise<void>;
+  deleteWardrobeItem: (id: string) => Promise<void>;
 
   // Outfits
   savedOutfits: Outfit[];
-  saveOutfit: (outfit: Omit<Outfit, 'id' | 'createdAt'>) => string;
-  deleteOutfit: (id: string) => void;
+  saveOutfit: (outfit: Omit<Outfit, 'id' | 'createdAt'>) => Promise<string>;
+  deleteOutfit: (id: string) => Promise<void>;
 
   // Plans
   outfitPlans: OutfitPlan[];
-  addOutfitPlan: (plan: Omit<OutfitPlan, 'id' | 'createdAt'>) => void;
-  updateOutfitPlan: (plan: OutfitPlan) => void;
-  deleteOutfitPlan: (id: string) => void;
+  addOutfitPlan: (plan: Omit<OutfitPlan, 'id' | 'createdAt'>) => Promise<void>;
+  updateOutfitPlan: (plan: OutfitPlan) => Promise<void>;
+  deleteOutfitPlan: (id: string) => Promise<void>;
 
   // Favourites
   favourites: string[];
-  toggleFavourite: (productId: string) => void;
+  toggleFavourite: (productId: string) => Promise<void>;
   isFavourite: (productId: string) => boolean;
 
   // Cart
@@ -74,12 +90,13 @@ interface AppContextType {
 
   // Profile
   userProfile: UserProfile;
-  updateUserProfile: (profile: Partial<UserProfile>) => void;
+  updateUserProfile: (profile: Partial<UserProfile>) => Promise<void>;
 
   // Activity & Feedback
   activityLog: ActivityLog[];
   feedbackList: FeedbackSubmission[];
-  submitFeedback: (feedback: Omit<FeedbackSubmission, 'id' | 'createdAt'>) => void;
+  submitFeedback: (feedback: Omit<FeedbackSubmission, 'id' | 'createdAt'>) => Promise<void>;
+  recordCheckoutOrder: (orderData: any) => Promise<boolean>;
 
   // Utilities & Demo Reset
   resetAllDemoData: () => void;
@@ -90,17 +107,23 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Navigation state
+  // Navigation & Modals
   const [activePage, setActivePage] = useState<PageId>('home');
   const [selectedProductForModal, setSelectedProductForModal] = useState<Product | null>(null);
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState<boolean>(false);
   const [toast, setToast] = useState<{ text: string; type: 'success' | 'info' | 'error' } | null>(null);
 
+  // Auth & Cloud State
+  const [currentUser, setCurrentUser] = useState<AuthUserState | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signin');
+
   // Products
   const [products] = useState<Product[]>(INITIAL_PRODUCTS);
 
-  // Wardrobe state (LocalStorage)
+  // Local/Guest State (LocalStorage initialized)
   const [wardrobe, setWardrobe] = useState<WardrobeItem[]>(() => {
     try {
       const saved = localStorage.getItem('stylesync_wardrobe');
@@ -110,7 +133,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   });
 
-  // Outfits state (LocalStorage)
   const [savedOutfits, setSavedOutfits] = useState<Outfit[]>(() => {
     try {
       const saved = localStorage.getItem('stylesync_outfits');
@@ -120,7 +142,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   });
 
-  // Plans state (LocalStorage)
   const [outfitPlans, setOutfitPlans] = useState<OutfitPlan[]>(() => {
     try {
       const saved = localStorage.getItem('stylesync_plans');
@@ -130,7 +151,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   });
 
-  // Favourites state (LocalStorage)
   const [favourites, setFavourites] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem('stylesync_favourites');
@@ -140,7 +160,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   });
 
-  // Cart state (LocalStorage)
   const [cart, setCart] = useState<CartItem[]>(() => {
     try {
       const saved = localStorage.getItem('stylesync_cart');
@@ -152,7 +171,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   });
 
-  // User Profile (LocalStorage)
   const [userProfile, setUserProfile] = useState<UserProfile>(() => {
     try {
       const saved = localStorage.getItem('stylesync_profile');
@@ -162,7 +180,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   });
 
-  // Activity Log (LocalStorage)
   const [activityLog, setActivityLog] = useState<ActivityLog[]>(() => {
     try {
       const saved = localStorage.getItem('stylesync_activity');
@@ -176,7 +193,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   });
 
-  // Feedback list
   const [feedbackList, setFeedbackList] = useState<FeedbackSubmission[]>(() => {
     try {
       const saved = localStorage.getItem('stylesync_feedback');
@@ -186,7 +202,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   });
 
-  // Sync to LocalStorage
+  // Local storage synchronization (used for guest cache and offline preservation)
   useEffect(() => {
     localStorage.setItem('stylesync_wardrobe', JSON.stringify(wardrobe));
   }, [wardrobe]);
@@ -220,15 +236,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [feedbackList]);
 
   // Toast helper
-  const showToast = (text: string, type: 'success' | 'info' | 'error' = 'success') => {
+  const showToast = useCallback((text: string, type: 'success' | 'info' | 'error' = 'success') => {
     setToast({ text, type });
     setTimeout(() => {
       setToast((prev) => (prev?.text === text ? null : prev));
-    }, 3800);
-  };
+    }, 4000);
+  }, []);
 
-  // Activity logger helper
-  const logActivity = (text: string, iconType: ActivityLog['iconType']) => {
+  const logActivity = useCallback((text: string, iconType: ActivityLog['iconType']) => {
     const newEntry: ActivityLog = {
       id: Date.now().toString(),
       text,
@@ -236,45 +251,211 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       iconType
     };
     setActivityLog(prev => [newEntry, ...prev.slice(0, 19)]);
+  }, []);
+
+  // --------------------------------------------------------------------------
+  // SUPABASE AUTHENTICATION & CLOUD DATA HYDRATION
+  // --------------------------------------------------------------------------
+  const loadUserDataFromCloud = useCallback(async (userId: string) => {
+    try {
+      const [cloudWardrobe, cloudOutfits, cloudPlans, cloudFavs, cloudProfile] = await Promise.all([
+        cloudService.getWardrobe(userId),
+        cloudService.getSavedOutfits(userId),
+        cloudService.getPlans(userId),
+        cloudService.getFavourites(userId),
+        cloudService.getProfile(userId),
+      ]);
+
+      if (cloudWardrobe.length > 0) setWardrobe(cloudWardrobe);
+      if (cloudOutfits.length > 0) setSavedOutfits(cloudOutfits);
+      if (cloudPlans.length > 0) setOutfitPlans(cloudPlans);
+      if (cloudFavs.length > 0) setFavourites(cloudFavs);
+      if (cloudProfile) setUserProfile(cloudProfile);
+
+      logActivity('Synchronized user assets with Supabase Cloud', 'stylist');
+    } catch (err) {
+      console.error('Failed to load user data from Supabase:', err);
+    }
+  }, [logActivity]);
+
+  useEffect(() => {
+    if (!supabase || !isSupabaseConfigured) {
+      setIsAuthLoading(false);
+      return;
+    }
+
+    // Check existing Supabase session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setCurrentUser({
+          id: session.user.id,
+          email: session.user.email || '',
+          fullName: session.user.user_metadata?.full_name,
+        });
+        loadUserDataFromCloud(session.user.id);
+      }
+      setIsAuthLoading(false);
+    });
+
+    // Listen for auth state changes (sign in, sign out, token refresh)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session?.user) {
+        setCurrentUser({
+          id: session.user.id,
+          email: session.user.email || '',
+          fullName: session.user.user_metadata?.full_name,
+        });
+        loadUserDataFromCloud(session.user.id);
+      } else {
+        setCurrentUser(null);
+      }
+      setIsAuthLoading(false);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [loadUserDataFromCloud]);
+
+  // Auth Operations
+  const signInWithEmail = async (email: string, pass: string) => {
+    if (!supabase || !isSupabaseConfigured) {
+      return { error: 'Supabase is not configured yet. Running in local demo mode.' };
+    }
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password: pass,
+    });
+    if (error) return { error: error.message };
+    if (data.user) {
+      setCurrentUser({
+        id: data.user.id,
+        email: data.user.email || '',
+        fullName: data.user.user_metadata?.full_name,
+      });
+      loadUserDataFromCloud(data.user.id);
+    }
+    return {};
   };
 
+  const signUpWithEmail = async (email: string, pass: string, fullName?: string, migrateData = true) => {
+    if (!supabase || !isSupabaseConfigured) {
+      return { error: 'Supabase is not configured yet. Running in local demo mode.' };
+    }
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password: pass,
+      options: {
+        data: { full_name: fullName || email.split('@')[0] },
+      },
+    });
+    if (error) return { error: error.message };
+
+    if (data.user) {
+      setCurrentUser({
+        id: data.user.id,
+        email: data.user.email || '',
+        fullName: fullName || data.user.email?.split('@')[0],
+      });
+
+      // Migrate existing local data if requested
+      if (migrateData) {
+        try {
+          await cloudService.migrateLocalDataToCloud(data.user.id, {
+            wardrobe,
+            outfits: savedOutfits,
+            plans: outfitPlans,
+            favourites,
+          });
+          showToast('Guest demo wardrobe migrated to your cloud account!', 'success');
+        } catch (mErr) {
+          console.error('Migration error:', mErr);
+        }
+      }
+      return { message: 'Account registered successfully!' };
+    }
+    return {};
+  };
+
+  const signOut = async () => {
+    if (supabase && isSupabaseConfigured) {
+      await supabase.auth.signOut();
+    }
+    setCurrentUser(null);
+    showToast('Signed out. Local guest demo restored.', 'info');
+  };
+
+  const syncLocalDataToCloud = async () => {
+    if (!currentUser) {
+      setIsAuthModalOpen(true);
+      return { success: false, count: 0 };
+    }
+    const result = await cloudService.migrateLocalDataToCloud(currentUser.id, {
+      wardrobe,
+      outfits: savedOutfits,
+      plans: outfitPlans,
+      favourites,
+    });
+    showToast(`Synced ${result.migratedItems} items to your cloud database!`, 'success');
+    return { success: true, count: result.migratedItems };
+  };
+
+  // --------------------------------------------------------------------------
+  // NAVIGATION & TOAST
+  // --------------------------------------------------------------------------
   const navigateTo = (page: PageId) => {
     setActivePage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Favourites actions
-  const toggleFavourite = (productId: string) => {
-    setFavourites(prev => {
-      const exists = prev.includes(productId);
-      const prod = products.find(p => p.id === productId);
-      if (exists) {
-        showToast(`Removed from favourites`, 'info');
-        return prev.filter(id => id !== productId);
-      } else {
-        showToast(`Added ${prod?.name || 'item'} to favourites!`, 'success');
-        logActivity(`Favourited ${prod?.name || 'an item'}`, 'outfit');
-        return [...prev, productId];
+  // --------------------------------------------------------------------------
+  // FAVOURITES ACTIONS
+  // --------------------------------------------------------------------------
+  const toggleFavourite = async (productId: string) => {
+    const exists = favourites.includes(productId);
+    const prod = products.find(p => p.id === productId);
+
+    if (exists) {
+      setFavourites(prev => prev.filter(id => id !== productId));
+      showToast('Removed from favourites', 'info');
+      if (currentUser && isSupabaseConfigured) {
+        await cloudService.removeFavourite(currentUser.id, productId);
       }
-    });
+    } else {
+      setFavourites(prev => [...prev, productId]);
+      showToast(`Added ${prod?.name || 'item'} to favourites!`, 'success');
+      logActivity(`Favourited ${prod?.name || 'an item'}`, 'outfit');
+      if (currentUser && isSupabaseConfigured) {
+        await cloudService.addFavourite(currentUser.id, productId);
+      }
+    }
   };
 
   const isFavourite = (productId: string) => favourites.includes(productId);
 
-  // Cart actions
+  // --------------------------------------------------------------------------
+  // CART ACTIONS
+  // --------------------------------------------------------------------------
   const addToCart = (product: Product, size: string = 'M', quantity: number = 1) => {
     setCart(prev => {
       const existingIndex = prev.findIndex(item => item.product.id === product.id && item.selectedSize === size);
+      let updatedCart: CartItem[];
       if (existingIndex > -1) {
-        const copy = [...prev];
-        copy[existingIndex].quantity += quantity;
-        return copy;
+        updatedCart = [...prev];
+        updatedCart[existingIndex].quantity += quantity;
       } else {
-        return [...prev, { product, quantity, selectedSize: size }];
+        updatedCart = [...prev, { product, quantity, selectedSize: size }];
       }
+
+      if (currentUser && isSupabaseConfigured) {
+        const targetItem = updatedCart.find(i => i.product.id === product.id && i.selectedSize === size);
+        if (targetItem) cloudService.syncCartItem(currentUser.id, targetItem);
+      }
+      return updatedCart;
     });
-    logActivity(`Added ${product.name} to cart`, 'cart');
-    showToast(`Added ${product.name} (Size ${size}) to cart!`, 'success');
+
+    logActivity(`Added ${product.name} to bag`, 'cart');
+    showToast(`Added ${product.name} (Size ${size}) to shopping bag!`, 'success');
   };
 
   const updateCartQuantity = (productId: string, quantity: number) => {
@@ -282,25 +463,71 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       removeFromCart(productId);
       return;
     }
-    setCart(prev => prev.map(item => item.product.id === productId ? { ...item, quantity } : item));
+    setCart(prev => {
+      const updated = prev.map(item => item.product.id === productId ? { ...item, quantity } : item);
+      if (currentUser && isSupabaseConfigured) {
+        const target = updated.find(i => i.product.id === productId);
+        if (target) cloudService.syncCartItem(currentUser.id, target);
+      }
+      return updated;
+    });
   };
 
   const removeFromCart = (productId: string) => {
     setCart(prev => prev.filter(item => item.product.id !== productId));
-    showToast(`Item removed from cart`, 'info');
+    if (currentUser && isSupabaseConfigured) {
+      cloudService.removeCartItem(currentUser.id, productId);
+    }
+    showToast('Item removed from shopping bag', 'info');
   };
 
   const clearCart = () => {
     setCart([]);
+    if (currentUser && isSupabaseConfigured) {
+      cloudService.clearCart(currentUser.id);
+    }
   };
 
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
   const cartSubtotal = cart.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
 
-  // Wardrobe actions
-  const addWardrobeItem = (itemData: Omit<WardrobeItem, 'id' | 'createdAt'>) => {
+  // --------------------------------------------------------------------------
+  // WARDROBE ACTIONS (STORAGE & DB)
+  // --------------------------------------------------------------------------
+  const addWardrobeItem = async (itemData: Omit<WardrobeItem, 'id' | 'createdAt'>, fileToUpload?: File) => {
+    let finalImageUrl = itemData.image;
+    let storagePath: string | undefined = undefined;
+
+    // If user is logged in with Supabase and provided a File, upload to Supabase Storage
+    if (currentUser && isSupabaseConfigured && fileToUpload) {
+      showToast('Uploading wardrobe image to cloud storage...', 'info');
+      const uploadRes = await cloudService.uploadWardrobeImage(currentUser.id, fileToUpload);
+      if (uploadRes) {
+        finalImageUrl = uploadRes.publicUrl;
+        storagePath = uploadRes.storagePath;
+      }
+    }
+
+    // Cloud DB insert if logged in
+    if (currentUser && isSupabaseConfigured) {
+      const cloudItem = await cloudService.addWardrobeItem(currentUser.id, {
+        ...itemData,
+        image: finalImageUrl,
+      }, storagePath);
+
+      if (cloudItem) {
+        setWardrobe(prev => [cloudItem, ...prev]);
+        logActivity(`Saved "${cloudItem.name}" to Cloud Wardrobe`, 'wardrobe');
+        showToast(`"${cloudItem.name}" saved to your cloud wardrobe!`, 'success');
+        return;
+      }
+    }
+
+    // Local / Guest fallback
     const newItem: WardrobeItem = {
       ...itemData,
+      image: finalImageUrl,
+      storagePath,
       id: `wardrobe-${Date.now()}`,
       createdAt: new Date().toISOString().split('T')[0]
     };
@@ -309,19 +536,37 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast(`"${newItem.name}" saved to your wardrobe!`, 'success');
   };
 
-  const updateWardrobeItem = (item: WardrobeItem) => {
+  const updateWardrobeItem = async (item: WardrobeItem) => {
     setWardrobe(prev => prev.map(w => w.id === item.id ? item : w));
+    if (currentUser && isSupabaseConfigured) {
+      await cloudService.updateWardrobeItem(currentUser.id, item);
+    }
     showToast(`Updated "${item.name}"`, 'success');
   };
 
-  const deleteWardrobeItem = (id: string) => {
+  const deleteWardrobeItem = async (id: string) => {
     const item = wardrobe.find(w => w.id === id);
     setWardrobe(prev => prev.filter(w => w.id !== id));
+    if (currentUser && isSupabaseConfigured) {
+      await cloudService.deleteWardrobeItem(currentUser.id, id, item?.storagePath);
+    }
     showToast(`Removed "${item?.name || 'item'}" from wardrobe`, 'info');
   };
 
-  // Outfit actions
-  const saveOutfit = (outfitData: Omit<Outfit, 'id' | 'createdAt'>): string => {
+  // --------------------------------------------------------------------------
+  // OUTFITS ACTIONS
+  // --------------------------------------------------------------------------
+  const saveOutfit = async (outfitData: Omit<Outfit, 'id' | 'createdAt'>): Promise<string> => {
+    if (currentUser && isSupabaseConfigured) {
+      const cloudOutfit = await cloudService.saveOutfit(currentUser.id, outfitData);
+      if (cloudOutfit) {
+        setSavedOutfits(prev => [cloudOutfit, ...prev]);
+        logActivity(`Saved look "${cloudOutfit.name}" to Cloud`, 'outfit');
+        showToast(`Outfit "${cloudOutfit.name}" synced to cloud!`, 'success');
+        return cloudOutfit.id;
+      }
+    }
+
     const newId = `outfit-${Date.now()}`;
     const newOutfit: Outfit = {
       ...outfitData,
@@ -334,14 +579,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return newId;
   };
 
-  const deleteOutfit = (id: string) => {
+  const deleteOutfit = async (id: string) => {
     const outfit = savedOutfits.find(o => o.id === id);
     setSavedOutfits(prev => prev.filter(o => o.id !== id));
+    if (currentUser && isSupabaseConfigured) {
+      await cloudService.deleteOutfit(currentUser.id, id);
+    }
     showToast(`Deleted outfit "${outfit?.name || ''}"`, 'info');
   };
 
-  // Plan actions
-  const addOutfitPlan = (planData: Omit<OutfitPlan, 'id' | 'createdAt'>) => {
+  // --------------------------------------------------------------------------
+  // OUTFIT PLANS ACTIONS
+  // --------------------------------------------------------------------------
+  const addOutfitPlan = async (planData: Omit<OutfitPlan, 'id' | 'createdAt'>) => {
+    if (currentUser && isSupabaseConfigured) {
+      const cloudPlan = await cloudService.addPlan(currentUser.id, planData);
+      if (cloudPlan) {
+        setOutfitPlans(prev => [...prev, cloudPlan].sort((a, b) => a.date.localeCompare(b.date)));
+        logActivity(`Scheduled look for ${cloudPlan.date}`, 'plan');
+        showToast(`Outfit scheduled in cloud calendar for ${cloudPlan.date}!`, 'success');
+        return;
+      }
+    }
+
     const newPlan: OutfitPlan = {
       ...planData,
       id: `plan-${Date.now()}`,
@@ -352,34 +612,57 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast(`Outfit scheduled for ${newPlan.date}!`, 'success');
   };
 
-  const updateOutfitPlan = (plan: OutfitPlan) => {
+  const updateOutfitPlan = async (plan: OutfitPlan) => {
     setOutfitPlans(prev => prev.map(p => p.id === plan.id ? plan : p));
+    if (currentUser && isSupabaseConfigured) {
+      await cloudService.updatePlan(currentUser.id, plan);
+    }
     showToast(`Updated plan for ${plan.date}`, 'success');
   };
 
-  const deleteOutfitPlan = (id: string) => {
+  const deleteOutfitPlan = async (id: string) => {
     setOutfitPlans(prev => prev.filter(p => p.id !== id));
-    showToast(`Plan removed`, 'info');
+    if (currentUser && isSupabaseConfigured) {
+      await cloudService.deletePlan(currentUser.id, id);
+    }
+    showToast('Plan removed from calendar', 'info');
   };
 
-  // User Profile
-  const updateUserProfile = (patch: Partial<UserProfile>) => {
+  // --------------------------------------------------------------------------
+  // PROFILE, FEEDBACK & CHECKOUT ORDERS
+  // --------------------------------------------------------------------------
+  const updateUserProfile = async (patch: Partial<UserProfile>) => {
     setUserProfile(prev => ({ ...prev, ...patch }));
-    showToast(`Profile preferences updated!`, 'success');
+    if (currentUser && isSupabaseConfigured) {
+      await cloudService.updateProfile(currentUser.id, patch);
+    }
+    showToast('Profile preferences updated!', 'success');
   };
 
-  // Feedback
-  const submitFeedback = (fb: Omit<FeedbackSubmission, 'id' | 'createdAt'>) => {
+  const submitFeedback = async (fb: Omit<FeedbackSubmission, 'id' | 'createdAt'>) => {
     const submission: FeedbackSubmission = {
       ...fb,
       id: `fb-${Date.now()}`,
       createdAt: new Date().toLocaleString()
     };
     setFeedbackList(prev => [submission, ...prev]);
-    showToast(`Thank you! Your feedback has been recorded.`, 'success');
+
+    if (isSupabaseConfigured) {
+      await cloudService.recordFeedback(currentUser?.id || null, fb);
+    }
+    showToast('Thank you! Your feedback has been recorded.', 'success');
   };
 
-  // Reset demo
+  const recordCheckoutOrder = async (orderData: any) => {
+    if (isSupabaseConfigured) {
+      return await cloudService.recordDemoOrder(currentUser?.id || null, orderData);
+    }
+    return true;
+  };
+
+  // --------------------------------------------------------------------------
+  // DEMO RESET
+  // --------------------------------------------------------------------------
   const resetAllDemoData = () => {
     localStorage.removeItem('stylesync_wardrobe');
     localStorage.removeItem('stylesync_outfits');
@@ -403,7 +686,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     ]);
     setFeedbackList([]);
 
-    showToast(`All demo data reset to default successfully!`, 'info');
+    showToast('All demo data reset to default successfully!', 'info');
   };
 
   return (
@@ -417,6 +700,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setIsCartOpen,
         isCheckoutOpen,
         setIsCheckoutOpen,
+        currentUser,
+        isAuthLoading,
+        isCloudConnected: isSupabaseConfigured,
+        isAuthModalOpen,
+        setIsAuthModalOpen,
+        authModalMode,
+        setAuthModalMode,
+        signInWithEmail,
+        signUpWithEmail,
+        signOut,
+        syncLocalDataToCloud,
         products,
         wardrobe,
         addWardrobeItem,
@@ -444,6 +738,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         activityLog,
         feedbackList,
         submitFeedback,
+        recordCheckoutOrder,
         resetAllDemoData,
         toast,
         showToast
