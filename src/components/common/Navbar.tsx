@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { PageId } from '../../types';
 import { 
@@ -19,7 +19,8 @@ import {
   Cloud,
   LogOut,
   LogIn,
-  Palette
+  Palette,
+  Search
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -30,21 +31,36 @@ export const Navbar: React.FC = () => {
     favourites, 
     setIsCartOpen,
     currentUser,
-    isCloudConnected,
     setIsAuthModalOpen,
     setAuthModalMode,
-    signOut
+    signOut,
+    searchQuery,
+    setSearchQuery
   } = useApp();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [companyDropdownOpen, setCompanyDropdownOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [navSearchInput, setNavSearchInput] = useState(searchQuery || '');
+
+  // Keep local search input in sync if context changes
+  useEffect(() => {
+    setNavSearchInput(searchQuery || '');
+  }, [searchQuery]);
 
   const handleNav = (page: PageId) => {
     navigateTo(page);
     setMobileMenuOpen(false);
     setCompanyDropdownOpen(false);
     setUserDropdownOpen(false);
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSearchQuery(navSearchInput.trim());
+    if (activePage !== 'discover') {
+      navigateTo('discover');
+    }
   };
 
   const navLinks: { label: string; page: PageId; icon: React.ReactNode }[] = [
@@ -66,45 +82,13 @@ export const Navbar: React.FC = () => {
   const isCompanyActive = ['about', 'team', 'business-plan', 'contact'].includes(activePage);
 
   return (
-    <header className="sticky top-0 z-40 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-[#EAE4DC] transition-all">
-      {/* Top Startup Announcement Bar */}
-      <div className="bg-[#1A1A1A] text-[#EDE7DF] text-xs py-2 px-4 sm:px-8 border-b border-[#332C26] flex items-center justify-between">
-        <div className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
-          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#C86D51] text-white font-bold text-[10px] tracking-wider uppercase">
-            Early Access
-          </span>
-          <span className="hidden sm:inline text-[#D4C9BC] text-xs">
-            Experience algorithmic capsule wardrobe curation & personal styling.
-          </span>
-          <span className="sm:hidden text-[11px] text-[#D4C9BC]">
-            Smart Wardrobe & AI Styling Studio
-          </span>
-        </div>
-        <div className="flex items-center gap-4 text-[11px] text-[#B8ACA0] shrink-0">
-          <span className="inline-flex items-center gap-1.5 text-emerald-400 font-medium">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            Styling Studio Live
-          </span>
-          {isCloudConnected ? (
-            <span className="hidden md:inline-flex items-center gap-1 text-emerald-400 text-[10px] bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-800">
-              <Cloud className="w-3 h-3 text-emerald-400" />
-              <span>Supabase Cloud Connected</span>
-            </span>
-          ) : (
-            <span className="hidden md:inline-flex items-center gap-1 text-amber-300 text-[10px] bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-800">
-              <Cloud className="w-3 h-3 text-amber-400" />
-              <span>Guest Session</span>
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Main Navbar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+    <header className="sticky top-0 z-40 bg-[#FAF8F5]/98 backdrop-blur-md border-b border-[#EAE4DC] shadow-sm transition-all">
+      {/* Primary Header Row: Brand Logo, Prominent Search Bar, User Actions */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
         {/* Brand Logo */}
         <div 
           onClick={() => handleNav('home')} 
-          className="cursor-pointer flex items-center gap-3 group"
+          className="cursor-pointer flex items-center gap-3 group shrink-0"
         >
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1A1A1A] to-[#38332E] flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
             <span className="font-serif text-2xl italic font-bold">S</span>
@@ -113,75 +97,37 @@ export const Navbar: React.FC = () => {
             <span className="font-serif text-2xl font-bold tracking-tight text-[#1A1A1A] leading-tight">
               StyleSync
             </span>
-            <span className="text-[10px] tracking-wider text-[#8C7E6D] uppercase font-semibold">
+            <span className="text-[10px] tracking-wider text-[#8C7E6D] uppercase font-semibold hidden sm:inline">
               Your Wardrobe. Your Style. Smarter Choices.
             </span>
           </div>
         </div>
 
-        {/* Desktop Navigation Links */}
-        <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5">
-          {navLinks.map((link) => {
-            const isActive = activePage === link.page;
-            return (
-              <button
-                key={link.page}
-                onClick={() => handleNav(link.page)}
-                className={`px-3 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-1.5 ${
-                  isActive
-                    ? 'bg-white text-[#1A1A1A] shadow-sm border border-[#E2DAD0] font-semibold'
-                    : 'text-[#5C5245] hover:text-[#1A1A1A] hover:bg-[#F3EFE8]'
-                }`}
-              >
-                {link.icon}
-                {link.label}
-              </button>
-            );
-          })}
-
-          {/* Company Dropdown */}
-          <div className="relative">
+        {/* Amazon/Flipkart-Inspired Prominent Search Bar */}
+        <form 
+          onSubmit={handleSearchSubmit} 
+          className="hidden md:flex flex-1 max-w-xl mx-4 relative"
+        >
+          <div className="relative w-full flex items-center">
+            <input
+              type="text"
+              value={navSearchInput}
+              onChange={(e) => setNavSearchInput(e.target.value)}
+              placeholder="Search clothes, shirts, dresses, sneakers, styles..."
+              className="w-full bg-white border border-[#DDD5CB] text-xs text-[#1A1A1A] placeholder-[#8C7E6D] rounded-full py-2.5 pl-10 pr-24 focus:outline-none focus:ring-2 focus:ring-[#1A1A1A] transition-all shadow-sm"
+            />
+            <Search className="w-4 h-4 text-[#8C7E6D] absolute left-3.5 pointer-events-none" />
             <button
-              onClick={() => setCompanyDropdownOpen(!companyDropdownOpen)}
-              className={`px-3 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-1.5 ${
-                isCompanyActive
-                  ? 'bg-white text-[#C86D51] shadow-sm border border-[#E2DAD0] font-semibold'
-                  : 'text-[#5C5245] hover:text-[#1A1A1A] hover:bg-[#F3EFE8]'
-              }`}
+              type="submit"
+              className="absolute right-1 px-4 py-1.5 rounded-full bg-[#1A1A1A] hover:bg-[#333333] text-white text-xs font-semibold transition-all shadow-sm"
             >
-              <span>Company</span>
-              <ChevronDown className="w-3.5 h-3.5 opacity-70" />
+              Search
             </button>
-
-            {companyDropdownOpen && (
-              <div 
-                className="absolute top-full right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-[#EDE8E0] p-2 z-50 animate-in fade-in slide-in-from-top-2"
-                onMouseLeave={() => setCompanyDropdownOpen(false)}
-              >
-                <div className="px-3 py-1.5 text-[10px] uppercase font-bold tracking-wider text-[#9E9080] border-b border-[#F5F2EB] mb-1">
-                  StyleSync Ecosystem
-                </div>
-                {companyLinks.map((item) => (
-                  <button
-                    key={item.page}
-                    onClick={() => handleNav(item.page)}
-                    className={`w-full text-left px-3 py-2 rounded-xl text-xs font-medium flex items-center gap-2.5 transition-colors ${
-                      activePage === item.page
-                        ? 'bg-[#FDF8F5] text-[#C86D51] font-semibold'
-                        : 'text-[#4A4237] hover:bg-[#FAF8F5]'
-                    }`}
-                  >
-                    <span className="text-[#8C7E6D]">{item.icon}</span>
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
-        </nav>
+        </form>
 
         {/* Right Action Icons (Favourites, Cart, Profile/Auth, Mobile Menu) */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           {/* Favourites / Wishlist */}
           <button
             onClick={() => handleNav('profile')}
@@ -287,6 +233,103 @@ export const Navbar: React.FC = () => {
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
+      </div>
+
+      {/* Secondary Navigation Row: Desktop Categories & Features */}
+      <div className="hidden lg:flex items-center justify-between border-t border-[#EAE4DC] bg-[#FAF8F5]/80 px-4 sm:px-6 lg:px-8 py-2">
+        <nav className="flex items-center gap-1 xl:gap-2">
+          {navLinks.map((link) => {
+            const isActive = activePage === link.page;
+            return (
+              <button
+                key={link.page}
+                onClick={() => handleNav(link.page)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 ${
+                  isActive
+                    ? 'bg-white text-[#1A1A1A] shadow-sm border border-[#E2DAD0] font-semibold'
+                    : 'text-[#5C5245] hover:text-[#1A1A1A] hover:bg-[#F3EFE8]'
+                }`}
+              >
+                {link.icon}
+                {link.label}
+              </button>
+            );
+          })}
+
+          {/* Company Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setCompanyDropdownOpen(!companyDropdownOpen)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 ${
+                isCompanyActive
+                  ? 'bg-white text-[#C86D51] shadow-sm border border-[#E2DAD0] font-semibold'
+                  : 'text-[#5C5245] hover:text-[#1A1A1A] hover:bg-[#F3EFE8]'
+              }`}
+            >
+              <span>Company</span>
+              <ChevronDown className="w-3 h-3 opacity-70" />
+            </button>
+
+            {companyDropdownOpen && (
+              <div 
+                className="absolute top-full left-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-[#EDE8E0] p-2 z-50 animate-in fade-in slide-in-from-top-2"
+                onMouseLeave={() => setCompanyDropdownOpen(false)}
+              >
+                <div className="px-3 py-1.5 text-[10px] uppercase font-bold tracking-wider text-[#9E9080] border-b border-[#F5F2EB] mb-1">
+                  StyleSync Ecosystem
+                </div>
+                {companyLinks.map((item) => (
+                  <button
+                    key={item.page}
+                    onClick={() => handleNav(item.page)}
+                    className={`w-full text-left px-3 py-2 rounded-xl text-xs font-medium flex items-center gap-2.5 transition-colors ${
+                      activePage === item.page
+                        ? 'bg-[#FDF8F5] text-[#C86D51] font-semibold'
+                        : 'text-[#4A4237] hover:bg-[#FAF8F5]'
+                    }`}
+                  >
+                    <span className="text-[#8C7E6D]">{item.icon}</span>
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </nav>
+
+        {/* Feature Pill on the right */}
+        <div className="flex items-center gap-4 text-xs text-[#8C7E6D]">
+          <span className="hidden xl:inline-flex items-center gap-1.5 font-medium text-[#6B5E50]">
+            <Sparkles className="w-3.5 h-3.5 text-[#C86D51]" />
+            Algorithmic Styling & Capsule Curation
+          </span>
+          <button 
+            onClick={() => handleNav('discover')} 
+            className="text-[11px] font-bold text-[#C86D51] hover:underline"
+          >
+            Explore Catalog &rarr;
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Search Bar (Visible on mobile/tablet) */}
+      <div className="md:hidden px-4 pb-3 pt-1 border-t border-[#EAE4DC] bg-[#FAF8F5]">
+        <form onSubmit={handleSearchSubmit} className="relative">
+          <input
+            type="text"
+            value={navSearchInput}
+            onChange={(e) => setNavSearchInput(e.target.value)}
+            placeholder="Search clothes, shoes, accessories..."
+            className="w-full bg-white border border-[#DDD5CB] text-xs text-[#1A1A1A] placeholder-[#8C7E6D] rounded-full py-2 pl-9 pr-20 focus:outline-none focus:ring-1 focus:ring-[#1A1A1A]"
+          />
+          <Search className="w-4 h-4 text-[#8C7E6D] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <button
+            type="submit"
+            className="absolute right-1 top-1/2 -translate-y-1/2 px-3 py-1 rounded-full bg-[#1A1A1A] text-white text-[11px] font-semibold"
+          >
+            Search
+          </button>
+        </form>
       </div>
 
       {/* Mobile Drawer */}

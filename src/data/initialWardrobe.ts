@@ -8,7 +8,7 @@ export const INITIAL_WARDROBE: WardrobeItem[] = [
     slot: 'top',
     color: 'White',
     season: 'All-Season',
-    tags: ['Basic', 'Campus Essential', 'Formal'],
+    tags: ['Basic', 'Capsule Essential', 'Formal'],
     image: 'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?auto=format&fit=crop&w=800&q=80',
     createdAt: '2026-09-15'
   },
@@ -63,7 +63,7 @@ export const INITIAL_WARDROBE: WardrobeItem[] = [
     slot: 'bottom',
     color: 'Olive Green',
     season: 'All-Season',
-    tags: ['Smart Casual', 'Presentation'],
+    tags: ['Smart Casual', 'Executive'],
     image: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=800&q=80',
     createdAt: '2026-09-28'
   }

@@ -452,7 +452,7 @@ export const OutfitBuilderPage: React.FC = () => {
                   onChange={(e) => setOutfitOccasion(e.target.value as OccasionTag)}
                   className="w-full px-3 py-2 rounded-xl border border-[#DDD5CB] text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none"
                 >
-                  <option value="College">College</option>
+                  <option value="Work & Office">Work & Office</option>
                   <option value="Casual outing">Casual outing</option>
                   <option value="Formal meeting">Formal meeting</option>
                   <option value="Party">Party</option>

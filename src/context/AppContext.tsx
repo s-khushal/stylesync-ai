@@ -31,6 +31,8 @@ interface AppContextType {
   // Navigation & modals
   activePage: PageId;
   navigateTo: (page: PageId) => void;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
   selectedProductForModal: Product | null;
   setSelectedProductForModal: (product: Product | null) => void;
   isCartOpen: boolean;
@@ -108,6 +110,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Navigation & Modals
   const [activePage, setActivePage] = useState<PageId>('home');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedProductForModal, setSelectedProductForModal] = useState<Product | null>(null);
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState<boolean>(false);
@@ -694,6 +697,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       value={{
         activePage,
         navigateTo,
+        searchQuery,
+        setSearchQuery,
         selectedProductForModal,
         setSelectedProductForModal,
         isCartOpen,

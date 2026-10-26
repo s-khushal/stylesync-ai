@@ -34,6 +34,7 @@ export const StylistPage: React.FC = () => {
   });
 
   const [seedOffset, setSeedOffset] = useState<number>(0);
+  const [replaceOffsets, setReplaceOffsets] = useState<Record<string, number>>({});
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [generatedOutfit, setGeneratedOutfit] = useState<{
     top?: OutfitPiece;
@@ -65,7 +66,7 @@ export const StylistPage: React.FC = () => {
   const [customOutfitName, setCustomOutfitName] = useState('My AI Curated Ensemble');
 
   const occasions: OccasionTag[] = [
-    'College',
+    'Work & Office',
     'Casual outing',
     'Party',
     'Formal meeting',
@@ -118,6 +119,9 @@ export const StylistPage: React.FC = () => {
 
   const handleReplacePiece = (slot: 'top' | 'bottom' | 'footwear' | 'outerwear' | 'accessory') => {
     if (!generatedOutfit) return;
+    const currentOffset = (replaceOffsets[slot] || 0) + 1;
+    setReplaceOffsets(prev => ({ ...prev, [slot]: currentOffset }));
+
     const criteria: StylistCriteria = {
       occasion,
       style,
@@ -127,15 +131,16 @@ export const StylistPage: React.FC = () => {
       includeCategories
     };
 
-    const candidates = rankCandidatesForSlot(products, slot, criteria, seedOffset + 1);
+    const candidates = rankCandidatesForSlot(products, slot, criteria, seedOffset + currentOffset);
     if (candidates.length <= 1) {
       showToast(`No alternative ${slot} found in catalogue`, 'info');
       return;
     }
 
-    // Pick candidate different from current
+    // Pick candidate different from current piece
     const currentId = generatedOutfit[slot]?.id;
-    const nextCandidate = candidates.find(c => c.product.id !== currentId) || candidates[0];
+    const otherCandidates = candidates.filter(c => c.product.id !== currentId);
+    const nextCandidate = otherCandidates[(currentOffset - 1) % otherCandidates.length] || candidates[0];
 
     const updatedPiece: OutfitPiece = {
       id: nextCandidate.product.id,
@@ -297,7 +302,7 @@ export const StylistPage: React.FC = () => {
               className="w-full accent-[#C86D51] cursor-pointer"
             />
             <div className="flex justify-between text-[10px] text-[#8C7E6D] mt-1 font-medium">
-              <span>₹2,000 (Budget Student)</span>
+              <span>₹2,000 (Smart Value)</span>
               <span>₹8,500</span>
               <span>₹15,000 (Luxury Ensemble)</span>
             </div>

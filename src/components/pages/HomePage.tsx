@@ -163,19 +163,19 @@ export const HomePage: React.FC = () => {
                 </button>
               </div>
 
-              {/* Startup Metrics */}
+              {/* Core Feature Pillars */}
               <div className="pt-6 grid grid-cols-3 gap-4 border-t border-[#EAE3D8] max-w-lg">
                 <div>
-                  <div className="text-2xl font-serif font-bold text-[#1A1A1A]">10,000+</div>
-                  <div className="text-xs text-[#8C7E6D] mt-0.5">Outfits Generated</div>
+                  <div className="text-xl sm:text-2xl font-serif font-bold text-[#1A1A1A]">Smart Match</div>
+                  <div className="text-xs text-[#8C7E6D] mt-0.5">Algorithmic Harmony</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-serif font-bold text-[#C86D51]">94%</div>
-                  <div className="text-xs text-[#8C7E6D] mt-0.5">Color Harmony Avg.</div>
+                  <div className="text-xl sm:text-2xl font-serif font-bold text-[#C86D51]">Capsule Logic</div>
+                  <div className="text-xs text-[#8C7E6D] mt-0.5">3.5x Rewear Value</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-serif font-bold text-[#1A1A1A]">3.5x</div>
-                  <div className="text-xs text-[#8C7E6D] mt-0.5">More Wear Per Item</div>
+                  <div className="text-xl sm:text-2xl font-serif font-bold text-[#1A1A1A]">100% Private</div>
+                  <div className="text-xs text-[#8C7E6D] mt-0.5">Secure Cloud Storage</div>
                 </div>
               </div>
             </div>

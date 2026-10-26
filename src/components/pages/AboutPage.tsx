@@ -52,12 +52,12 @@ export const AboutPage: React.FC = () => {
             {
               num: '01',
               title: 'Morning Outfit Decision Paralysis',
-              desc: 'Students and young employees spend 15–20 minutes daily debating what to wear, leading to unnecessary morning rush and stress.'
+              desc: 'Modern professionals and fashion-conscious individuals spend 15–20 minutes daily debating what to wear, leading to unnecessary morning rush and stress.'
             },
             {
               num: '02',
               title: 'Occasion Uncertainty',
-              desc: 'Finding outfits suited for specific event dress codes (placement presentations, campus fests, casual meetups) is confusing and time-consuming.'
+              desc: 'Finding outfits suited for specific event dress codes (executive presentations, dinner events, and weekend gatherings) is confusing and time-consuming.'
             },
             {
               num: '03',
@@ -140,7 +140,7 @@ export const AboutPage: React.FC = () => {
             Target Demographic: 18–30 in India
           </h3>
           <p className="text-xs text-[#5C5245] leading-relaxed">
-            Our beachhead market comprises undergraduate and postgraduate university students, management interns, and early-career corporate and creative professionals in Tier-1 and Tier-2 Indian cities (Delhi NCR, Bengaluru, Mumbai, Pune, Hyderabad, Jaipur).
+            Our beachhead market comprises early-career professionals, creative entrepreneurs, and digital natives in Tier-1 and Tier-2 Indian cities (Delhi NCR, Bengaluru, Mumbai, Pune, Hyderabad, Jaipur).
           </p>
           <ul className="space-y-2 text-xs text-[#4A4237]">
             <li className="flex items-center gap-2">
@@ -153,7 +153,7 @@ export const AboutPage: React.FC = () => {
             </li>
             <li className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-[#C86D51]"></span>
-              <span><strong>Time-Poor:</strong> Busy balancing coursework, interviews, and social events.</span>
+              <span><strong>Time-Poor:</strong> Busy balancing demanding careers, travel, and active lifestyles.</span>
             </li>
           </ul>
         </div>

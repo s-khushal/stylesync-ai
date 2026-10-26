@@ -95,7 +95,7 @@ export const BusinessPlanPage: React.FC = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 {[
                   { title: 'Launch Working MVP', desc: 'Deploy an interactive local prototype to validate core user journeys without external paid dependencies.' },
-                  { title: 'Audience Utility Validation', desc: 'Verify whether college students and young professionals actively solve their morning dressing dilemmas.' },
+                  { title: 'Audience Utility Validation', desc: 'Verify whether modern professionals and style-conscious individuals actively solve their morning dressing dilemmas.' },
                   { title: 'Algorithmic Refinement', desc: 'Continuously improve multi-factor recommendation accuracy and harmony across occasions and budgets.' },
                   { title: 'Encourage Reusability', desc: 'Drive repeat usage metrics where users save, revisit, and synchronize outfits into calendar schedules.' },
                   { title: 'Establish Commercial Partnerships', desc: 'Explore affiliate agreements with emerging Indian sustainable fashion labels.' },

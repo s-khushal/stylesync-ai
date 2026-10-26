@@ -30,7 +30,7 @@ export const OutfitPlannerPage: React.FC = () => {
   const [formNotes, setFormNotes] = useState<string>('');
 
   const occasions: OccasionTag[] = [
-    'College',
+    'Work & Office',
     'Casual outing',
     'Party',
     'Formal meeting',
@@ -158,7 +158,7 @@ export const OutfitPlannerPage: React.FC = () => {
             No Upcoming Outfit Plans
           </h3>
           <p className="text-xs text-[#8C7E6D] leading-relaxed">
-            Stay ahead of your academic and social schedule. Plan your Monday presentation or Friday college fest attire ahead of time.
+            Stay ahead of your weekly schedule. Plan your Monday executive meeting or Friday dinner attire ahead of time.
           </p>
           <button
             onClick={handleOpenAdd}

@@ -4,15 +4,15 @@ export const INITIAL_PLANS: OutfitPlan[] = [
   {
     id: 'plan-1',
     date: '2026-10-14',
-    occasion: 'College',
+    occasion: 'Work & Office',
     outfitId: 'outfit-1',
-    outfitName: 'Smart Campus Presentation Look',
+    outfitName: 'Smart Executive Presentation Look',
     outfitPreviewImages: [
       'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=400&q=80',
       'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=400&q=80',
       'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=400&q=80'
     ],
-    notes: 'Case study pitch for Essentials of Management class. Don’t forget laptop and clicker.',
+    notes: 'Executive strategic pitch and leadership review. Don’t forget presentation notes and tablet.',
     createdAt: '2026-10-06'
   },
   {
@@ -25,7 +25,7 @@ export const INITIAL_PLANS: OutfitPlan[] = [
       'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=400&q=80',
       'https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=400&q=80'
     ],
-    notes: 'Meetup with design club peers at Blue Tokai.',
+    notes: 'Coffee strategy session with design partners at Blue Tokai.',
     createdAt: '2026-10-08'
   }
 ];

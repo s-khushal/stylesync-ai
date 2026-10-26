@@ -26,7 +26,7 @@ export const cloudService = {
     return {
       name: data.full_name || '',
       email: data.email || '',
-      collegeOrProfession: data.college_or_profession || 'Student / Professional',
+      collegeOrProfession: data.college_or_profession || 'Member / Professional',
       bio: data.bio || '',
       preferredStyles: data.preferred_styles || [],
       favoriteColors: data.favorite_colors || [],

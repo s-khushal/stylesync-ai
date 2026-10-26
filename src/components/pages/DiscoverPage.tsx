@@ -1,19 +1,27 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Category, StyleTag, Product } from '../../types';
+import { Category, StyleTag, OccasionTag } from '../../types';
 import { ProductCard } from '../common/ProductCard';
-import { Search, SlidersHorizontal, RotateCcw, Compass, ArrowUpDown } from 'lucide-react';
+import { Search, RotateCcw, Compass, ArrowUpDown } from 'lucide-react';
 
 export const DiscoverPage: React.FC = () => {
-  const { products } = useApp();
+  const { products, searchQuery, setSearchQuery } = useApp();
 
   // Search & Filter state
-  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState<string>(searchQuery || '');
   const [selectedCategory, setSelectedCategory] = useState<Category | 'All'>('All');
+  const [selectedOccasion, setSelectedOccasion] = useState<OccasionTag | 'All'>('All');
   const [selectedStyle, setSelectedStyle] = useState<StyleTag | 'All'>('All');
   const [selectedColor, setSelectedColor] = useState<string>('All');
   const [priceMax, setPriceMax] = useState<number>(5000);
   const [sortBy, setSortBy] = useState<'relevance' | 'price-asc' | 'price-desc' | 'rating'>('relevance');
+
+  // Sync with global search query when it changes
+  useEffect(() => {
+    if (searchQuery !== undefined && searchQuery !== searchTerm) {
+      setSearchTerm(searchQuery);
+    }
+  }, [searchQuery]);
 
   const categories: (Category | 'All')[] = [
     'All',
@@ -26,6 +34,17 @@ export const DiscoverPage: React.FC = () => {
     'Jackets',
     'Footwear',
     'Accessories'
+  ];
+
+  const occasions: (OccasionTag | 'All')[] = [
+    'All',
+    'Work & Office',
+    'Casual outing',
+    'Party',
+    'Formal meeting',
+    'Wedding or celebration',
+    'Travel',
+    'Everyday wear'
   ];
 
   const styles: (StyleTag | 'All')[] = [
@@ -47,7 +66,8 @@ export const DiscoverPage: React.FC = () => {
     'Blue',
     'Olive',
     'Black',
-    'White'
+    'White',
+    'Rust'
   ];
 
   // Filtering Logic
@@ -59,7 +79,9 @@ export const DiscoverPage: React.FC = () => {
         const matchesName = item.name.toLowerCase().includes(term);
         const matchesDesc = item.description.toLowerCase().includes(term);
         const matchesCat = item.category.toLowerCase().includes(term);
-        if (!matchesName && !matchesDesc && !matchesCat) return false;
+        const matchesStyle = item.styles.some(s => s.toLowerCase().includes(term));
+        const matchesColor = item.colors.some(c => c.toLowerCase().includes(term));
+        if (!matchesName && !matchesDesc && !matchesCat && !matchesStyle && !matchesColor) return false;
       }
 
       // 2. Category match
@@ -67,18 +89,23 @@ export const DiscoverPage: React.FC = () => {
         return false;
       }
 
-      // 3. Style match
+      // 3. Occasion match
+      if (selectedOccasion !== 'All' && !item.occasions.includes(selectedOccasion)) {
+        return false;
+      }
+
+      // 4. Style match
       if (selectedStyle !== 'All' && !item.styles.includes(selectedStyle)) {
         return false;
       }
 
-      // 4. Color match
+      // 5. Color match
       if (selectedColor !== 'All') {
         const hasColor = item.colors.some(c => c.toLowerCase().includes(selectedColor.toLowerCase()));
         if (!hasColor) return false;
       }
 
-      // 5. Price Max match
+      // 6. Price Max match
       if (item.price > priceMax) {
         return false;
       }
@@ -90,18 +117,20 @@ export const DiscoverPage: React.FC = () => {
       if (sortBy === 'rating') return b.rating - a.rating;
       return b.rating * b.reviewsCount - a.rating * a.reviewsCount; // Relevance
     });
-  }, [products, searchTerm, selectedCategory, selectedStyle, selectedColor, priceMax, sortBy]);
+  }, [products, searchTerm, selectedCategory, selectedOccasion, selectedStyle, selectedColor, priceMax, sortBy]);
 
   const handleResetFilters = () => {
     setSearchTerm('');
+    setSearchQuery('');
     setSelectedCategory('All');
+    setSelectedOccasion('All');
     setSelectedStyle('All');
     setSelectedColor('All');
     setPriceMax(5000);
     setSortBy('relevance');
   };
 
-  const isFiltered = searchTerm !== '' || selectedCategory !== 'All' || selectedStyle !== 'All' || selectedColor !== 'All' || priceMax < 5000;
+  const isFiltered = searchTerm !== '' || selectedCategory !== 'All' || selectedOccasion !== 'All' || selectedStyle !== 'All' || selectedColor !== 'All' || priceMax < 5000;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
@@ -109,13 +138,13 @@ export const DiscoverPage: React.FC = () => {
       <div className="space-y-3">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF5EE] border border-[#E8DFC8] text-xs font-semibold text-[#8C533E]">
           <Compass className="w-3.5 h-3.5" />
-          <span>Curated Indian Fashion Tech Catalogue</span>
+          <span>Curated Fashion Storefront</span>
         </div>
         <h1 className="font-serif text-3xl sm:text-4xl font-bold text-[#1A1A1A]">
-          Discover Fashion
+          Curated Shop & Catalog
         </h1>
         <p className="text-xs sm:text-sm text-[#6B5E50] max-w-2xl leading-relaxed">
-          Explore 28 realistic fashion essentials curated for university campuses and young urban professionals. Filter by aesthetic, occasion palette, and Indian Rupee budget.
+          Explore versatile fashion essentials designed to mix-and-match effortlessly. Filter by garment category, occasion, style aesthetic, color palette, and budget.
         </p>
       </div>
 
@@ -125,12 +154,15 @@ export const DiscoverPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
           {/* Search Input */}
           <div className="md:col-span-8 relative">
-            <Search className="w-4 h-4 text-[#8C7E6D] absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-[#8C7E6D] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search by garment title, linen, chanderi, oversized, cargo..."
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setSearchQuery(e.target.value);
+              }}
+              placeholder="Search garments by name, linen, denim, blazer, sneakers, kurta..."
               className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#DDD5CB] text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1A1A1A]"
             />
           </div>
@@ -143,17 +175,17 @@ export const DiscoverPage: React.FC = () => {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="w-full px-3 py-2.5 rounded-xl border border-[#DDD5CB] text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none font-medium"
+              className="w-full px-3 py-2.5 rounded-xl border border-[#DDD5CB] text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none font-medium cursor-pointer"
             >
               <option value="relevance">Relevance & Popularity</option>
               <option value="price-asc">Price: Low to High</option>
               <option value="price-desc">Price: High to Low</option>
-              <option value="rating">Highest Rated</option>
+              <option value="rating">Highest Customer Rating</option>
             </select>
           </div>
         </div>
 
-        {/* Category Pills */}
+        {/* Category Navigation Pills */}
         <div>
           <span className="text-[11px] font-bold uppercase tracking-wider text-[#8C7E6D] block mb-2">
             Garment Category
@@ -175,8 +207,24 @@ export const DiscoverPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Secondary Filters: Style, Color, Price Range */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4 border-t border-[#F5F2EB]">
+        {/* Secondary Filters: Occasion, Style, Color, Price Range */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-[#F5F2EB]">
+          {/* Occasion Filter */}
+          <div>
+            <label className="text-[11px] font-bold uppercase tracking-wider text-[#8C7E6D] block mb-1.5">
+              Occasion
+            </label>
+            <select
+              value={selectedOccasion}
+              onChange={(e) => setSelectedOccasion(e.target.value as any)}
+              className="w-full px-3 py-2 rounded-xl border border-[#DDD5CB] text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none cursor-pointer"
+            >
+              {occasions.map(o => (
+                <option key={o} value={o}>{o}</option>
+              ))}
+            </select>
+          </div>
+
           {/* Style Filter */}
           <div>
             <label className="text-[11px] font-bold uppercase tracking-wider text-[#8C7E6D] block mb-1.5">
@@ -185,7 +233,7 @@ export const DiscoverPage: React.FC = () => {
             <select
               value={selectedStyle}
               onChange={(e) => setSelectedStyle(e.target.value as any)}
-              className="w-full px-3 py-2 rounded-xl border border-[#DDD5CB] text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none"
+              className="w-full px-3 py-2 rounded-xl border border-[#DDD5CB] text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none cursor-pointer"
             >
               {styles.map(s => (
                 <option key={s} value={s}>{s}</option>
@@ -201,7 +249,7 @@ export const DiscoverPage: React.FC = () => {
             <select
               value={selectedColor}
               onChange={(e) => setSelectedColor(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-[#DDD5CB] text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none"
+              className="w-full px-3 py-2 rounded-xl border border-[#DDD5CB] text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none cursor-pointer"
             >
               {colors.map(c => (
                 <option key={c} value={c}>{c}</option>
@@ -223,7 +271,7 @@ export const DiscoverPage: React.FC = () => {
               type="range"
               min="800"
               max="5000"
-              step="200"
+              step="100"
               value={priceMax}
               onChange={(e) => setPriceMax(Number(e.target.value))}
               className="w-full accent-[#C86D51] cursor-pointer"
@@ -231,7 +279,7 @@ export const DiscoverPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Results Counter and Reset */}
+        {/* Results Counter and Reset Button */}
         <div className="flex items-center justify-between pt-2 border-t border-[#F5F2EB] text-xs">
           <span className="text-[#5C5245] font-medium">
             Showing <strong className="text-[#1A1A1A]">{filteredProducts.length}</strong> of {products.length} products

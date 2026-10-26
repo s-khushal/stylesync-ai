@@ -3,8 +3,8 @@ import { Outfit } from '../types';
 export const INITIAL_OUTFITS: Outfit[] = [
   {
     id: 'outfit-1',
-    name: 'Smart Campus Presentation Look',
-    occasion: 'College',
+    name: 'Smart Executive Presentation Look',
+    occasion: 'Work & Office',
     style: 'Smart casual',
     top: {
       id: 'prod-1',
@@ -14,7 +14,7 @@ export const INITIAL_OUTFITS: Outfit[] = [
       image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=800&q=80',
       price: 1499,
       source: 'catalogue',
-      reason: 'Breezy and modern linen balances relaxed elegance with presentation authority.'
+      reason: 'Breezy and modern linen balances relaxed elegance with executive authority.'
     },
     bottom: {
       id: 'prod-6',
@@ -44,11 +44,11 @@ export const INITIAL_OUTFITS: Outfit[] = [
       image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80',
       price: 1999,
       source: 'catalogue',
-      reason: 'Carries college laptop and journals without cluttering clean aesthetics.'
+      reason: 'Carries work laptop and notebook without cluttering clean aesthetics.'
     },
     totalPrice: 7796,
     createdAt: '2026-10-01',
-    notes: 'Selected for economics presentation and faculty mentoring session.'
+    notes: 'Selected for executive strategy presentation and stakeholder review.'
   },
   {
     id: 'outfit-2',

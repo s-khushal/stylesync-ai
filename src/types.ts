@@ -18,13 +18,14 @@ export type StyleTag =
   | 'Traditional fusion';
 
 export type OccasionTag = 
-  | 'College'
+  | 'Work & Office'
   | 'Casual outing'
   | 'Party'
   | 'Formal meeting'
   | 'Wedding or celebration'
   | 'Travel'
-  | 'Everyday wear';
+  | 'Everyday wear'
+  | 'College';
 
 export type SeasonTag = 'All-Season' | 'Summer' | 'Winter' | 'Monsoon' | 'Spring';
 
