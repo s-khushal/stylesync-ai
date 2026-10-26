@@ -25,7 +25,7 @@ export const OutfitPlannerPage: React.FC = () => {
     const today = new Date();
     return today.toISOString().split('T')[0];
   });
-  const [formOccasion, setFormOccasion] = useState<string>('College');
+  const [formOccasion, setFormOccasion] = useState<string>('Casual outing');
   const [formOutfitId, setFormOutfitId] = useState<string>(() => savedOutfits[0]?.id || '');
   const [formNotes, setFormNotes] = useState<string>('');
 
@@ -48,7 +48,7 @@ export const OutfitPlannerPage: React.FC = () => {
     const today = new Date();
     today.setDate(today.getDate() + 1);
     setFormDate(today.toISOString().split('T')[0]);
-    setFormOccasion('College');
+    setFormOccasion('Casual outing');
     setFormOutfitId(savedOutfits[0]?.id || '');
     setFormNotes('');
     setIsModalOpen(true);
@@ -136,7 +136,7 @@ export const OutfitPlannerPage: React.FC = () => {
             Outfit Calendar Planner
           </h1>
           <p className="text-xs sm:text-sm text-[#6B5E50] mt-1">
-            Map out what to wear for presentations, campus events, and weekends. Eliminate morning decision panic.
+            Map out what to wear for strategy reviews, dinners, and weekend getaways. Eliminate morning dressing friction.
           </p>
         </div>
 
@@ -228,7 +228,7 @@ export const OutfitPlannerPage: React.FC = () => {
               </div>
 
               <div className="pt-3 border-t border-[#F5F2EB] flex items-center justify-between text-xs text-[#8C7E6D]">
-                <span>Planned for Campus</span>
+                <span>Scheduled in Calendar</span>
                 <span className="text-emerald-700 font-semibold flex items-center gap-1">
                   <CheckCircle2 className="w-3.5 h-3.5" /> Synchronized
                 </span>
@@ -310,7 +310,7 @@ export const OutfitPlannerPage: React.FC = () => {
                   value={formNotes}
                   onChange={(e) => setFormNotes(e.target.value)}
                   rows={2}
-                  placeholder="e.g. Carry formal portfolio; light jacket if auditorium AC is chilly."
+                  placeholder="e.g. Evening outdoor terrace; bring light layer if temperature drops."
                   className="w-full px-3.5 py-2 rounded-xl border border-[#DDD5CB] text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none"
                 />
               </div>

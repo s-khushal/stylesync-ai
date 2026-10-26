@@ -22,13 +22,13 @@ export const BusinessPlanPage: React.FC = () => {
       <div className="text-center max-w-3xl mx-auto space-y-4">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF5EE] border border-[#E8DFC8] text-xs font-semibold text-[#8C533E]">
           <Briefcase className="w-3.5 h-3.5" />
-          <span>Coursework Planning Framework</span>
+          <span>Startup Strategic Framework</span>
         </div>
         <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-[#1A1A1A]">
           StyleSync Business Plan
         </h1>
         <p className="text-xs sm:text-sm text-[#6B5E50] leading-relaxed">
-          Structured strictly according to the six fundamental management planning components for the Essentials of Management business project.
+          Structured across the six core startup planning pillars: strategic objectives, target market, resource allocation, milestones, risk mitigation, and KPI metrics.
         </p>
       </div>
 
@@ -99,7 +99,7 @@ export const BusinessPlanPage: React.FC = () => {
                   { title: 'Algorithmic Refinement', desc: 'Continuously improve multi-factor recommendation accuracy and harmony across occasions and budgets.' },
                   { title: 'Encourage Reusability', desc: 'Drive repeat usage metrics where users save, revisit, and synchronize outfits into calendar schedules.' },
                   { title: 'Establish Commercial Partnerships', desc: 'Explore affiliate agreements with emerging Indian sustainable fashion labels.' },
-                  { title: 'Academic Rigor', desc: 'Demonstrate principles of planning, organizing, staffing, and controlling from Essentials of Management.' },
+                  { title: 'Operational Excellence', desc: 'Maintain strict quality benchmarks across planning, system architecture, team operations, and customer trust.' },
                 ].map((g, i) => (
                   <div key={i} className="p-3.5 rounded-xl bg-[#FAF8F5] border border-[#EAE3D8] space-y-1">
                     <span className="font-bold text-[#1A1A1A] flex items-center gap-1.5">
@@ -276,7 +276,7 @@ export const BusinessPlanPage: React.FC = () => {
               {
                 time: 'MONTH 1',
                 phase: 'Research & Prototype',
-                status: 'Completed for Project Demo',
+                status: 'Milestone Achieved (Beta MVP)',
                 color: 'border-[#1A1A1A] bg-[#FAF8F5]',
                 tasks: [
                   'Research 18–30 student customer habits',
@@ -296,7 +296,7 @@ export const BusinessPlanPage: React.FC = () => {
                   'Implement digital wardrobe with image upload',
                   'Implement rule-based AI stylist with swapping',
                   'Test responsive desktop/mobile layouts',
-                  'Present interactive MVP to college professor'
+                  'Deploy production release and activate early user cohort'
                 ]
               },
               {
@@ -469,7 +469,7 @@ export const BusinessPlanPage: React.FC = () => {
                 <tbody className="divide-y divide-[#F5F2EB]">
                   {[
                     { risk: 'Poor Recommendation Quality', sol: 'Implement immediate user feedback loop, adjust multi-factor weight scoring, and enforce curated stylistic rules.', owner: 'AI Engineer & Tech Lead' },
-                    { risk: 'Low User Adoption', sol: 'Conduct structured student interviews on campus, simplify upload friction with preset tags, and run styling workshops.', owner: 'UX Designer & Marketing Manager' },
+                    { risk: 'Low User Adoption', sol: 'Conduct structured customer interviews, simplify upload friction with preset tags, and run styling workshops.', owner: 'UX Designer & Marketing Manager' },
                     { risk: 'Privacy & Upload Concerns', sol: 'Enforce local device storage, zero cloud transmission without consent, and one-click data purge buttons.', owner: 'Cybersecurity Specialist' },
                     { risk: 'AI Service Downtime / Cost Outage', sol: 'Deploy deterministic local rule-based scoring engine as an instantaneous, zero-cost fallback.', owner: 'Technical Lead' },
                     { risk: 'Budget & Resource Constraints', sol: 'Ruthlessly prioritize the web MVP, eliminate non-essential paid tooling, and utilize open-source frameworks.', owner: 'Finance Manager & Project Lead' },

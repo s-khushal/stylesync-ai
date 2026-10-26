@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { StyleTag, OccasionTag } from '../../types';
+import { StyleTag } from '../../types';
 import { ProductCard } from '../common/ProductCard';
 import { 
   User, 
@@ -10,14 +10,8 @@ import {
   Heart, 
   ShoppingBag, 
   Clock, 
-  RotateCcw, 
-  Check, 
-  Sliders, 
-  ShieldAlert,
-  Cloud,
-  LogIn,
   LogOut,
-  UploadCloud
+  ArrowRight
 } from 'lucide-react';
 
 export const ProfilePage: React.FC = () => {
@@ -31,14 +25,9 @@ export const ProfilePage: React.FC = () => {
     updateUserProfile, 
     activityLog, 
     products, 
-    resetAllDemoData,
-    showToast,
     navigateTo,
     currentUser,
-    isCloudConnected,
-    setIsAuthModalOpen,
-    signOut,
-    syncLocalDataToCloud
+    signOut
   } = useApp();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -104,7 +93,7 @@ export const ProfilePage: React.FC = () => {
         </p>
       </div>
 
-      {/* 1. REAL DYNAMIC STATS (Not hardcoded) */}
+      {/* 1. REAL DYNAMIC STATS */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         {[
           {
@@ -167,24 +156,36 @@ export const ProfilePage: React.FC = () => {
           <div className="flex items-center justify-between pb-4 border-b border-[#F5F2EB]">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-2xl bg-[#1A1A1A] text-white flex items-center justify-center font-serif text-xl font-bold">
-                {userProfile.name.charAt(0)}
+                {(currentUser?.fullName || userProfile.name || currentUser?.email || 'M').charAt(0).toUpperCase()}
               </div>
               <div>
                 <h3 className="font-serif text-lg font-bold text-[#1A1A1A]">
-                  {userProfile.name}
+                  {currentUser?.fullName || userProfile.name || (currentUser ? currentUser.email.split('@')[0] : 'StyleSync Member')}
                 </h3>
                 <p className="text-xs text-[#8C7E6D]">
-                  {userProfile.collegeOrProfession}
+                  {userProfile.collegeOrProfession || (currentUser ? currentUser.email : 'Personal Capsule Wardrobe')}
                 </p>
               </div>
             </div>
 
-            <button
-              onClick={() => setIsEditing(!isEditing)}
-              className="py-1.5 px-3.5 rounded-xl border border-[#DDD5CB] hover:bg-[#FAF8F5] text-xs font-semibold text-[#1A1A1A] transition-colors"
-            >
-              {isEditing ? 'Cancel Edit' : 'Edit Preferences'}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsEditing(!isEditing)}
+                className="py-1.5 px-3.5 rounded-xl border border-[#DDD5CB] hover:bg-[#FAF8F5] text-xs font-semibold text-[#1A1A1A] transition-colors"
+              >
+                {isEditing ? 'Cancel Edit' : 'Edit Preferences'}
+              </button>
+              {currentUser && (
+                <button
+                  onClick={signOut}
+                  className="py-1.5 px-3 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-semibold transition-colors flex items-center gap-1"
+                  title="Sign Out"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Sign Out</span>
+                </button>
+              )}
+            </div>
           </div>
 
           {isEditing ? (
@@ -204,14 +205,14 @@ export const ProfilePage: React.FC = () => {
 
               <div>
                 <label className="block text-xs font-semibold text-[#1A1A1A] mb-1">
-                  College Course / Profession
+                  Profession / Lifestyle Context
                 </label>
                 <input
                   type="text"
                   value={collegeOrProfession}
                   onChange={(e) => setCollegeOrProfession(e.target.value)}
+                  placeholder="e.g. Design Strategist, Consultant, Architect"
                   className="w-full px-3.5 py-2 rounded-xl border border-[#DDD5CB] text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none"
-                  required
                 />
               </div>
 
@@ -334,77 +335,61 @@ export const ProfilePage: React.FC = () => {
               </div>
             </div>
           )}
-
-          {/* Privacy & Auth Honest Disclosure */}
-          <div className="bg-[#FAF6F0] border border-[#E8DFC8] rounded-2xl p-4 text-[11px] text-[#5C5245] space-y-1">
-            <div className="flex items-center gap-1.5 font-bold text-[#8C533E]">
-              <ShieldAlert className="w-3.5 h-3.5" />
-              <span>Full-Stack Cloud & RLS Architecture</span>
-            </div>
-            <p className="leading-relaxed">
-              This application utilizes Supabase PostgreSQL with strict Row Level Security (RLS) policies and user-isolated Cloud Storage for wardrobe photographs. When running unauthenticated or offline, it safely falls back to local browser storage so evaluation is never interrupted.
-            </p>
-          </div>
         </div>
 
-        {/* Right: Cloud Sync, Live Activity Stream & Evaluator Reset Box */}
+        {/* Right: Studio Quick Actions & Recent Activity Log */}
         <div className="lg:col-span-5 space-y-6">
-          {/* Supabase Cloud Account & Synchronization Card */}
+          {/* Quick Styling Studio Navigation */}
           <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#EDE8E0] shadow-sm space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-[#F5F2EB]">
-              <div className="flex items-center gap-2">
-                <Cloud className={`w-4 h-4 ${currentUser ? 'text-emerald-700' : 'text-[#C86D51]'}`} />
-                <h3 className="font-serif text-lg font-bold text-[#1A1A1A]">
-                  Cloud Account & Sync
-                </h3>
-              </div>
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                currentUser ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
-              }`}>
-                {currentUser ? 'Cloud Synced' : 'Guest Demo Mode'}
-              </span>
+            <div className="pb-3 border-b border-[#F5F2EB]">
+              <h3 className="font-serif text-lg font-bold text-[#1A1A1A] flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-[#C86D51]" />
+                Styling Studio
+              </h3>
+              <p className="text-[11px] text-[#8C7E6D] mt-0.5">
+                Quick actions for your digital wardrobe & outfit planner
+              </p>
             </div>
 
-            {currentUser ? (
-              <div className="space-y-3 text-xs">
-                <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#EAE3D8] space-y-1">
-                  <div className="text-[#8C7E6D]">Authenticated User:</div>
-                  <div className="font-bold text-[#1A1A1A]">{currentUser.email}</div>
-                  <div className="text-[10px] text-[#8C7E6D] font-mono">UID: {currentUser.id.substring(0, 18)}...</div>
-                </div>
+            <div className="grid grid-cols-2 gap-3 text-xs">
+              <button
+                onClick={() => navigateTo('stylist')}
+                className="p-3.5 rounded-2xl bg-[#FAF8F5] hover:bg-[#FAF6F0] border border-[#EDE8E0] hover:border-[#1A1A1A] transition-all text-left flex flex-col justify-between group"
+              >
+                <Sparkles className="w-4 h-4 text-[#C86D51] mb-2 group-hover:scale-110 transition-transform" />
+                <span className="font-bold text-[#1A1A1A] block">AI Stylist</span>
+                <span className="text-[10px] text-[#8C7E6D]">Generate looks</span>
+              </button>
 
-                <div className="flex flex-col gap-2 pt-1">
-                  <button
-                    onClick={syncLocalDataToCloud}
-                    className="w-full py-2.5 px-4 rounded-xl bg-[#FAF6F0] hover:bg-[#F5ECE4] text-[#8C533E] border border-[#E8DFC8] text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-sm"
-                  >
-                    <UploadCloud className="w-3.5 h-3.5 text-[#C86D51]" />
-                    <span>Sync Local Guest Items to Cloud</span>
-                  </button>
-                  <button
-                    onClick={signOut}
-                    className="w-full py-2 px-4 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all"
-                  >
-                    <LogOut className="w-3.5 h-3.5" />
-                    <span>Sign Out of Supabase</span>
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-3 text-xs text-[#5C5245]">
-                <p className="leading-relaxed">
-                  Currently running in <strong>Guest Demo Mode</strong>. Create a free Supabase cloud account to sync your wardrobe images to secure cloud storage and access your outfits across devices.
-                </p>
-                <button
-                  onClick={() => setIsAuthModalOpen(true)}
-                  className="w-full py-2.5 px-4 rounded-xl bg-[#1A1A1A] hover:bg-[#333333] text-white text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-sm"
-                >
-                  <LogIn className="w-3.5 h-3.5 text-[#E07A5F]" />
-                  <span>Sign In / Create Cloud Account</span>
-                </button>
-              </div>
-            )}
+              <button
+                onClick={() => navigateTo('wardrobe')}
+                className="p-3.5 rounded-2xl bg-[#FAF8F5] hover:bg-[#FAF6F0] border border-[#EDE8E0] hover:border-[#1A1A1A] transition-all text-left flex flex-col justify-between group"
+              >
+                <Layers className="w-4 h-4 text-[#C86D51] mb-2 group-hover:scale-110 transition-transform" />
+                <span className="font-bold text-[#1A1A1A] block">My Wardrobe</span>
+                <span className="text-[10px] text-[#8C7E6D]">{wardrobe.length} items logged</span>
+              </button>
+
+              <button
+                onClick={() => navigateTo('builder')}
+                className="p-3.5 rounded-2xl bg-[#FAF8F5] hover:bg-[#FAF6F0] border border-[#EDE8E0] hover:border-[#1A1A1A] transition-all text-left flex flex-col justify-between group"
+              >
+                <Sparkles className="w-4 h-4 text-[#C86D51] mb-2 group-hover:scale-110 transition-transform" />
+                <span className="font-bold text-[#1A1A1A] block">Outfit Canvas</span>
+                <span className="text-[10px] text-[#8C7E6D]">{savedOutfits.length} saved looks</span>
+              </button>
+
+              <button
+                onClick={() => navigateTo('planner')}
+                className="p-3.5 rounded-2xl bg-[#FAF8F5] hover:bg-[#FAF6F0] border border-[#EDE8E0] hover:border-[#1A1A1A] transition-all text-left flex flex-col justify-between group"
+              >
+                <Calendar className="w-4 h-4 text-[#C86D51] mb-2 group-hover:scale-110 transition-transform" />
+                <span className="font-bold text-[#1A1A1A] block">Weekly Planner</span>
+                <span className="text-[10px] text-[#8C7E6D]">{outfitPlans.length} dates mapped</span>
+              </button>
+            </div>
           </div>
+
           {/* Recent Activity Log */}
           <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#EDE8E0] shadow-sm space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-[#F5F2EB]">
@@ -416,33 +401,20 @@ export const ProfilePage: React.FC = () => {
             </div>
 
             <div className="space-y-3">
-              {activityLog.slice(0, 5).map((log) => (
-                <div key={log.id} className="p-3 rounded-xl bg-[#FAF8F5] border border-[#EAE3D8] flex items-start gap-3">
-                  <div className="w-2 h-2 rounded-full bg-[#C86D51] mt-1.5 shrink-0" />
-                  <div className="flex-1">
-                    <p className="text-xs text-[#1A1A1A] font-medium">{log.text}</p>
-                    <span className="text-[10px] text-[#8C7E6D] mt-0.5 block">{log.timestamp}</span>
+              {activityLog.length === 0 ? (
+                <p className="text-xs text-[#8C7E6D] italic">No activity recorded yet.</p>
+              ) : (
+                activityLog.slice(0, 5).map((log) => (
+                  <div key={log.id} className="p-3 rounded-xl bg-[#FAF8F5] border border-[#EAE3D8] flex items-start gap-3">
+                    <div className="w-2 h-2 rounded-full bg-[#C86D51] mt-1.5 shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-xs text-[#1A1A1A] font-medium">{log.text}</p>
+                      <span className="text-[10px] text-[#8C7E6D] mt-0.5 block">{log.timestamp}</span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
-          </div>
-
-          {/* Evaluator Reset Tools */}
-          <div className="bg-[#FAF5EE] rounded-3xl p-6 border border-[#E8DFC8] space-y-3">
-            <h4 className="font-serif text-base font-bold text-[#1A1A1A]">
-              Professor / Evaluator Reset Controls
-            </h4>
-            <p className="text-xs text-[#6B5E50] leading-relaxed">
-              Want to run the complete user test journey from scratch? Click below to restore all seeded wardrobe, looks, and catalogue state.
-            </p>
-            <button
-              onClick={resetAllDemoData}
-              className="w-full py-2.5 px-4 rounded-xl bg-[#2D2824] hover:bg-[#1A1A1A] text-white text-xs font-semibold flex items-center justify-center gap-2 transition-all shadow-sm"
-            >
-              <RotateCcw className="w-3.5 h-3.5 text-[#E07A5F]" />
-              Restore Clean Demo State
-            </button>
           </div>
         </div>
       </div>

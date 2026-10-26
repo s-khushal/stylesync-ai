@@ -41,7 +41,7 @@ export const WardrobePage: React.FC = () => {
   const [formSlot, setFormSlot] = useState<'top' | 'bottom' | 'footwear' | 'outerwear' | 'accessory'>('top');
   const [formColor, setFormColor] = useState('White');
   const [formSeason, setFormSeason] = useState<SeasonTag>('All-Season');
-  const [formTags, setFormTags] = useState('Campus, Casual');
+  const [formTags, setFormTags] = useState('Work, Casual');
   const [formImage, setFormImage] = useState('');
   const [selectedUploadFile, setSelectedUploadFile] = useState<File | null>(null);
   const [imageError, setImageError] = useState('');
@@ -77,7 +77,7 @@ export const WardrobePage: React.FC = () => {
     setFormSlot('top');
     setFormColor('White');
     setFormSeason('All-Season');
-    setFormTags('Campus, Casual');
+    setFormTags('Work, Casual');
     setFormImage(samplePresets[0].url);
     setSelectedUploadFile(null);
     setImageError('');
@@ -199,7 +199,9 @@ export const WardrobePage: React.FC = () => {
             My Digital Wardrobe
           </h1>
           <p className="text-xs sm:text-sm text-[#6B5E50] mt-1">
-            Catalog what you already own. All uploads stay strictly private on your device via LocalStorage.
+            {currentUser 
+              ? 'Catalog what you own. All garments and photos are securely synced to your private Supabase Cloud account.'
+              : 'Catalog what you own. Sign in to sync your wardrobe across all devices.'}
           </p>
         </div>
 

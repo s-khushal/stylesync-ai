@@ -12,22 +12,19 @@ import {
   PageId 
 } from '../types';
 import { INITIAL_PRODUCTS } from '../data/products';
-import { INITIAL_WARDROBE } from '../data/initialWardrobe';
-import { INITIAL_OUTFITS } from '../data/initialOutfits';
-import { INITIAL_PLANS } from '../data/initialPlans';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { cloudService } from '../services/cloudService';
 
-const DEFAULT_PROFILE: UserProfile = {
-  name: 'Aanya Sharma',
-  email: 'aanya.sharma@campus.ac.in',
-  collegeOrProfession: 'Student, Management & Media Studies (21)',
-  bio: 'Balancing presentation elegance with everyday street minimalism on a student budget.',
-  preferredStyles: ['Smart casual', 'Minimalist', 'Traditional fusion'],
-  favoriteColors: ['Ivory', 'Terracotta', 'Sage Green', 'Charcoal'],
-  budgetMin: 800,
-  budgetMax: 3500,
-  preferredOccasions: ['College', 'Casual outing', 'Formal meeting']
+const EMPTY_PROFILE: UserProfile = {
+  name: '',
+  email: '',
+  collegeOrProfession: '',
+  bio: '',
+  preferredStyles: ['Minimalist', 'Smart casual'],
+  favoriteColors: ['Ivory', 'Terracotta', 'Charcoal'],
+  budgetMin: 1500,
+  budgetMax: 6000,
+  preferredOccasions: ['Casual outing', 'Formal meeting', 'Party']
 };
 
 interface AppContextType {
@@ -47,10 +44,12 @@ interface AppContextType {
   isCloudConnected: boolean;
   isAuthModalOpen: boolean;
   setIsAuthModalOpen: (open: boolean) => void;
-  authModalMode: 'signin' | 'signup';
-  setAuthModalMode: (mode: 'signin' | 'signup') => void;
+  authModalMode: 'signin' | 'signup' | 'forgot';
+  setAuthModalMode: (mode: 'signin' | 'signup' | 'forgot') => void;
   signInWithEmail: (email: string, pass: string) => Promise<{ error?: string }>;
   signUpWithEmail: (email: string, pass: string, fullName?: string, migrateData?: boolean) => Promise<{ error?: string; message?: string }>;
+  sendPasswordResetEmail: (email: string) => Promise<{ error?: string; message?: string }>;
+  resendConfirmationEmail: (email: string) => Promise<{ error?: string; message?: string }>;
   signOut: () => Promise<void>;
   syncLocalDataToCloud: () => Promise<{ success: boolean; count: number }>;
 
@@ -118,75 +117,26 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [currentUser, setCurrentUser] = useState<AuthUserState | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
-  const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signin');
+  const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup' | 'forgot'>('signin');
 
   // Products
   const [products] = useState<Product[]>(INITIAL_PRODUCTS);
 
-  // Local/Guest State (LocalStorage initialized)
-  const [wardrobe, setWardrobe] = useState<WardrobeItem[]>(() => {
-    try {
-      const saved = localStorage.getItem('stylesync_wardrobe');
-      return saved ? JSON.parse(saved) : INITIAL_WARDROBE;
-    } catch {
-      return INITIAL_WARDROBE;
-    }
-  });
-
-  const [savedOutfits, setSavedOutfits] = useState<Outfit[]>(() => {
-    try {
-      const saved = localStorage.getItem('stylesync_outfits');
-      return saved ? JSON.parse(saved) : INITIAL_OUTFITS;
-    } catch {
-      return INITIAL_OUTFITS;
-    }
-  });
-
-  const [outfitPlans, setOutfitPlans] = useState<OutfitPlan[]>(() => {
-    try {
-      const saved = localStorage.getItem('stylesync_plans');
-      return saved ? JSON.parse(saved) : INITIAL_PLANS;
-    } catch {
-      return INITIAL_PLANS;
-    }
-  });
-
-  const [favourites, setFavourites] = useState<string[]>(() => {
-    try {
-      const saved = localStorage.getItem('stylesync_favourites');
-      return saved ? JSON.parse(saved) : ['prod-1', 'prod-6'];
-    } catch {
-      return ['prod-1', 'prod-6'];
-    }
-  });
-
-  const [cart, setCart] = useState<CartItem[]>(() => {
-    try {
-      const saved = localStorage.getItem('stylesync_cart');
-      if (saved) return JSON.parse(saved);
-      const initialItem = INITIAL_PRODUCTS[0];
-      return [{ product: initialItem, quantity: 1, selectedSize: 'M' }];
-    } catch {
-      return [];
-    }
-  });
-
-  const [userProfile, setUserProfile] = useState<UserProfile>(() => {
-    try {
-      const saved = localStorage.getItem('stylesync_profile');
-      return saved ? JSON.parse(saved) : DEFAULT_PROFILE;
-    } catch {
-      return DEFAULT_PROFILE;
-    }
-  });
+  // Private User State (empty for visitors; loaded from Supabase upon login)
+  const [wardrobe, setWardrobe] = useState<WardrobeItem[]>([]);
+  const [savedOutfits, setSavedOutfits] = useState<Outfit[]>([]);
+  const [outfitPlans, setOutfitPlans] = useState<OutfitPlan[]>([]);
+  const [favourites, setFavourites] = useState<string[]>([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [userProfile, setUserProfile] = useState<UserProfile>(EMPTY_PROFILE);
 
   const [activityLog, setActivityLog] = useState<ActivityLog[]>(() => {
     try {
       const saved = localStorage.getItem('stylesync_activity');
       return saved ? JSON.parse(saved) : [
-        { id: '1', text: 'Stylist generated "Smart Campus Presentation Look"', timestamp: '2 hours ago', iconType: 'stylist' },
+        { id: '1', text: 'Stylist generated "Smart Casual Capsule Look"', timestamp: '2 hours ago', iconType: 'stylist' },
         { id: '2', text: 'Added Linen Resort Shirt to Favourites', timestamp: 'Yesterday', iconType: 'outfit' },
-        { id: '3', text: 'Scheduled outfit for 14th Oct presentation', timestamp: '2 days ago', iconType: 'plan' }
+        { id: '3', text: 'Scheduled outfit for Saturday Social', timestamp: '2 days ago', iconType: 'plan' }
       ];
     } catch {
       return [];
@@ -358,30 +308,61 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
     if (error) return { error: error.message };
 
+    // Supabase can either automatically sign in or require email confirmation
     if (data.user) {
-      setCurrentUser({
-        id: data.user.id,
-        email: data.user.email || '',
-        fullName: fullName || data.user.email?.split('@')[0],
-      });
+      if (data.session) {
+        setCurrentUser({
+          id: data.user.id,
+          email: data.user.email || '',
+          fullName: fullName || data.user.email?.split('@')[0],
+        });
 
-      // Migrate existing local data if requested
-      if (migrateData) {
-        try {
-          await cloudService.migrateLocalDataToCloud(data.user.id, {
-            wardrobe,
-            outfits: savedOutfits,
-            plans: outfitPlans,
-            favourites,
-          });
-          showToast('Guest demo wardrobe migrated to your cloud account!', 'success');
-        } catch (mErr) {
-          console.error('Migration error:', mErr);
+        // Migrate existing local data if requested
+        if (migrateData) {
+          try {
+            await cloudService.migrateLocalDataToCloud(data.user.id, {
+              wardrobe,
+              outfits: savedOutfits,
+              plans: outfitPlans,
+              favourites,
+            });
+            showToast('Guest wardrobe migrated to your cloud account!', 'success');
+          } catch (mErr) {
+            console.error('Migration error:', mErr);
+          }
         }
+        return { message: 'Account registered successfully!' };
+      } else {
+        // Confirmation email required
+        return { 
+          message: 'Account created! We sent a confirmation link to your email. Please verify before signing in.' 
+        };
       }
-      return { message: 'Account registered successfully!' };
     }
     return {};
+  };
+
+  const sendPasswordResetEmail = async (email: string) => {
+    if (!supabase || !isSupabaseConfigured) {
+      return { error: 'Supabase authentication is not configured.' };
+    }
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin,
+    });
+    if (error) return { error: error.message };
+    return { message: 'Password reset link sent to your email! Please check your inbox.' };
+  };
+
+  const resendConfirmationEmail = async (email: string) => {
+    if (!supabase || !isSupabaseConfigured) {
+      return { error: 'Supabase authentication is not configured.' };
+    }
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+    });
+    if (error) return { error: error.message };
+    return { message: 'Confirmation email resent! Please check your inbox.' };
   };
 
   const signOut = async () => {
@@ -684,7 +665,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   // --------------------------------------------------------------------------
-  // DEMO RESET
+  // CLEAN RESET
   // --------------------------------------------------------------------------
   const resetAllDemoData = () => {
     localStorage.removeItem('stylesync_wardrobe');
@@ -696,20 +677,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.removeItem('stylesync_activity');
     localStorage.removeItem('stylesync_feedback');
 
-    setWardrobe(INITIAL_WARDROBE);
-    setSavedOutfits(INITIAL_OUTFITS);
-    setOutfitPlans(INITIAL_PLANS);
-    setFavourites(['prod-1', 'prod-6']);
-    setCart([{ product: INITIAL_PRODUCTS[0], quantity: 1, selectedSize: 'M' }]);
-    setUserProfile(DEFAULT_PROFILE);
-    setActivityLog([
-      { id: '1', text: 'Stylist generated "Smart Campus Presentation Look"', timestamp: '2 hours ago', iconType: 'stylist' },
-      { id: '2', text: 'Added Linen Resort Shirt to Favourites', timestamp: 'Yesterday', iconType: 'outfit' },
-      { id: '3', text: 'Scheduled outfit for 14th Oct presentation', timestamp: '2 days ago', iconType: 'plan' }
-    ]);
+    setWardrobe([]);
+    setSavedOutfits([]);
+    setOutfitPlans([]);
+    setFavourites([]);
+    setCart([]);
+    setUserProfile(EMPTY_PROFILE);
+    setActivityLog([]);
     setFeedbackList([]);
 
-    showToast('All demo data reset to default successfully!', 'info');
+    showToast('Guest workspace cleared.', 'info');
   };
 
   return (
@@ -732,6 +709,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setAuthModalMode,
         signInWithEmail,
         signUpWithEmail,
+        sendPasswordResetEmail,
+        resendConfirmationEmail,
         signOut,
         syncLocalDataToCloud,
         products,

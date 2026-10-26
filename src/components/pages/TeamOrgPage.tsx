@@ -31,7 +31,7 @@ export const TeamOrgPage: React.FC = () => {
           Team & Organizational Structure
         </h1>
         <p className="text-xs sm:text-sm text-[#6B5E50] leading-relaxed">
-          Operational hierarchy, cross-functional collaboration channels, and governance principles based on the 12-person startup staffing specified in the college assignment.
+          Operational hierarchy, cross-functional collaboration channels, and governance principles powering StyleSync's 12-person specialized startup team.
         </p>
       </div>
 

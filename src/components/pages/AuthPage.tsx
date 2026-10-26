@@ -15,7 +15,8 @@ import {
   Layers, 
   Compass, 
   Calendar,
-  ExternalLink
+  KeyRound,
+  RotateCcw
 } from 'lucide-react';
 
 interface AuthPageProps {
@@ -26,12 +27,14 @@ export const AuthPage: React.FC<AuthPageProps> = ({ redirectTarget = 'profile' }
   const { 
     signInWithEmail, 
     signUpWithEmail, 
+    sendPasswordResetEmail,
+    resendConfirmationEmail,
     navigateTo, 
     showToast,
     currentUser 
   } = useApp();
 
-  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+  const [mode, setMode] = useState<'signin' | 'signup' | 'forgot'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -40,6 +43,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ redirectTarget = 'profile' }
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [canResendConfirmation, setCanResendConfirmation] = useState(false);
 
   // If already authenticated, redirect to home or target
   if (currentUser) {
@@ -52,9 +56,9 @@ export const AuthPage: React.FC<AuthPageProps> = ({ redirectTarget = 'profile' }
       case 'wardrobe':
         return 'your private Digital Wardrobe';
       case 'builder':
-        return 'the interactive Outfit Builder';
+        return 'the interactive Outfit Canvas';
       case 'planner':
-        return 'your Outfit Calendar Planner';
+        return 'your Weekly Outfit Planner';
       case 'profile':
       default:
         return 'your personalized Dashboard & Wardrobe';
@@ -79,7 +83,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ redirectTarget = 'profile' }
       return;
     }
 
-    if (!password || password.length < 6) {
+    if (mode !== 'forgot' && (!password || password.length < 6)) {
       setErrorMessage('Password must be at least 6 characters.');
       return;
     }
@@ -101,15 +105,24 @@ export const AuthPage: React.FC<AuthPageProps> = ({ redirectTarget = 'profile' }
           setSuccessMessage(
             result.message || 'Account created successfully! Check your email to confirm registration or sign in.'
           );
-          showToast('Account registered successfully! Redirecting...', 'success');
-          setTimeout(() => {
-            navigateTo((redirectTarget as any) || 'profile');
-          }, 1500);
+          showToast('Account registered successfully!', 'success');
+          setCanResendConfirmation(true);
+        }
+      } else if (mode === 'forgot') {
+        const result = await sendPasswordResetEmail(email.trim());
+        if (result.error) {
+          setErrorMessage(result.error);
+        } else {
+          setSuccessMessage(result.message || 'Password reset link sent! Check your inbox.');
+          showToast('Password reset link sent!', 'success');
         }
       } else {
         const result = await signInWithEmail(email.trim(), password);
         if (result.error) {
           setErrorMessage(result.error);
+          if (result.error.toLowerCase().includes('confirm') || result.error.toLowerCase().includes('verified')) {
+            setCanResendConfirmation(true);
+          }
         } else {
           showToast('Welcome back! Cloud sync active.', 'success');
           navigateTo((redirectTarget as any) || 'profile');
@@ -122,6 +135,22 @@ export const AuthPage: React.FC<AuthPageProps> = ({ redirectTarget = 'profile' }
     }
   };
 
+  const handleResendConfirmation = async () => {
+    if (!email.trim()) {
+      setErrorMessage('Please enter your email address first.');
+      return;
+    }
+    setIsLoading(true);
+    const res = await resendConfirmationEmail(email.trim());
+    setIsLoading(false);
+    if (res.error) {
+      setErrorMessage(res.error);
+    } else {
+      setSuccessMessage(res.message || 'Verification link resent! Please check your inbox.');
+      showToast('Confirmation email resent!', 'success');
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Target redirection alert if user was intercepted from a private page */}
@@ -131,7 +160,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ redirectTarget = 'profile' }
             <Lock className="w-4 h-4" />
           </div>
           <div className="text-xs">
-            <span className="font-bold text-[#1A1A1A] block">Private Page Access Protected</span>
+            <span className="font-bold text-[#1A1A1A] block">Member Authentication Required</span>
             <span className="text-[#6B5E50]">Please sign in or create an account to access {getTargetLabel()}.</span>
           </div>
         </div>
@@ -168,8 +197,8 @@ export const AuthPage: React.FC<AuthPageProps> = ({ redirectTarget = 'profile' }
               },
               {
                 icon: <Calendar className="w-4 h-4 text-[#C86D51]" />,
-                title: 'Calendar Schedule Synchronization',
-                desc: 'Map outfits to presentations and dates with secure cloud backup.'
+                title: 'Weekly Style Calendar',
+                desc: 'Map outfits to occasions and upcoming events with real-time sync.'
               }
             ].map((feature, idx) => (
               <div key={idx} className="p-3.5 rounded-2xl bg-white border border-[#EDE8E0] flex items-start gap-3 shadow-sm">
@@ -231,12 +260,12 @@ export const AuthPage: React.FC<AuthPageProps> = ({ redirectTarget = 'profile' }
             </button>
           </div>
 
-          {/* Environment Status Check (Requirement 7: Show clear setup message if missing) */}
+          {/* Environment Status Check */}
           {!isSupabaseConfigured ? (
             <div className="p-4 rounded-2xl bg-[#FFF8F5] border border-[#F3DACD] text-xs text-[#6B5E50] space-y-2.5">
               <div className="flex items-center gap-2 font-bold text-[#C86D51]">
                 <AlertTriangle className="w-4 h-4 shrink-0" />
-                <span>Supabase Environment Configuration Required</span>
+                <span>Supabase Configuration Required</span>
               </div>
               <p className="text-[11px] leading-relaxed">
                 Supabase credentials have not been configured yet. Authentication is protected and cannot be simulated with dummy credentials.
@@ -246,9 +275,6 @@ export const AuthPage: React.FC<AuthPageProps> = ({ redirectTarget = 'profile' }
                 <div className="text-[#8C533E]">VITE_SUPABASE_URL=https://your-project-id.supabase.co</div>
                 <div className="text-[#8C533E]">VITE_SUPABASE_ANON_KEY=your-supabase-anon-key</div>
               </div>
-              <p className="text-[10px] text-[#8C7E6D]">
-                See <code className="bg-white px-1 py-0.5 rounded border border-[#DDD]">README.md</code> for step-by-step Supabase project creation and <code className="bg-white px-1 py-0.5 rounded border border-[#DDD]">supabase/schema.sql</code> migration instructions.
-              </p>
             </div>
           ) : (
             <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center gap-2 text-xs text-emerald-900">
@@ -261,7 +287,18 @@ export const AuthPage: React.FC<AuthPageProps> = ({ redirectTarget = 'profile' }
           {errorMessage && (
             <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 flex items-start gap-2 text-xs animate-in fade-in">
               <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-              <span>{errorMessage}</span>
+              <div className="flex-1">
+                <span>{errorMessage}</span>
+                {canResendConfirmation && (
+                  <button
+                    type="button"
+                    onClick={handleResendConfirmation}
+                    className="mt-1.5 block font-bold text-[#C86D51] hover:underline"
+                  >
+                    Resend verification email →
+                  </button>
+                )}
+              </div>
             </div>
           )}
 
@@ -269,7 +306,18 @@ export const AuthPage: React.FC<AuthPageProps> = ({ redirectTarget = 'profile' }
           {successMessage && (
             <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 flex items-start gap-2 text-xs animate-in fade-in">
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-              <span>{successMessage}</span>
+              <div className="flex-1">
+                <span>{successMessage}</span>
+                {canResendConfirmation && (
+                  <button
+                    type="button"
+                    onClick={handleResendConfirmation}
+                    className="mt-1.5 block font-bold text-emerald-700 hover:underline"
+                  >
+                    Didn't get the email? Resend verification link
+                  </button>
+                )}
+              </div>
             </div>
           )}
 
@@ -286,7 +334,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ redirectTarget = 'profile' }
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    placeholder="e.g. Aanya Sharma"
+                    placeholder="e.g. Sarah Jenkins"
                     disabled={!isSupabaseConfigured || isLoading}
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#DDD5CB] text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] disabled:opacity-60"
                   />
@@ -304,7 +352,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ redirectTarget = 'profile' }
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@campus.ac.in"
+                  placeholder="name@example.com"
                   disabled={!isSupabaseConfigured || isLoading}
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#DDD5CB] text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] disabled:opacity-60"
                   required
@@ -312,23 +360,36 @@ export const AuthPage: React.FC<AuthPageProps> = ({ redirectTarget = 'profile' }
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-[#1A1A1A] mb-1">
-                Password *
-              </label>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-[#8C7E6D] absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="At least 6 characters"
-                  disabled={!isSupabaseConfigured || isLoading}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#DDD5CB] text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] disabled:opacity-60"
-                  required
-                />
+            {mode !== 'forgot' && (
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-semibold text-[#1A1A1A]">
+                    Password *
+                  </label>
+                  {mode === 'signin' && (
+                    <button
+                      type="button"
+                      onClick={() => setMode('forgot')}
+                      className="text-[11px] text-[#C86D51] hover:underline"
+                    >
+                      Forgot password?
+                    </button>
+                  )}
+                </div>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-[#8C7E6D] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="At least 6 characters"
+                    disabled={!isSupabaseConfigured || isLoading}
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#DDD5CB] text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] disabled:opacity-60"
+                    required
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             {mode === 'signup' && (
               <label className="flex items-start gap-2.5 text-xs text-[#5C5245] cursor-pointer bg-[#FAF8F5] p-3 rounded-xl border border-[#EAE3D8]">
@@ -340,7 +401,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ redirectTarget = 'profile' }
                   className="accent-[#C86D51] mt-0.5 rounded"
                 />
                 <span className="text-[11px] leading-relaxed">
-                  <strong>Sync Guest Data:</strong> Automatically copy my local guest demo wardrobe items and calendar plans into my cloud database account.
+                  <strong>Sync Guest Wardrobe:</strong> Automatically migrate items, saved looks, and calendar schedules into your permanent cloud account.
                 </span>
               </label>
             )}
@@ -357,12 +418,40 @@ export const AuthPage: React.FC<AuthPageProps> = ({ redirectTarget = 'profile' }
                 </>
               ) : (
                 <>
-                  <Lock className="w-3.5 h-3.5 text-[#E07A5F]" />
-                  <span>{mode === 'signin' ? 'Sign In & Open Dashboard' : 'Create Supabase Account'}</span>
+                  {mode === 'signin' && (
+                    <>
+                      <Lock className="w-3.5 h-3.5 text-[#E07A5F]" />
+                      <span>Sign In & Open Dashboard</span>
+                    </>
+                  )}
+                  {mode === 'signup' && (
+                    <>
+                      <Sparkles className="w-3.5 h-3.5 text-[#E07A5F]" />
+                      <span>Create Free Account</span>
+                    </>
+                  )}
+                  {mode === 'forgot' && (
+                    <>
+                      <KeyRound className="w-3.5 h-3.5 text-[#E07A5F]" />
+                      <span>Send Password Reset Link</span>
+                    </>
+                  )}
                 </>
               )}
             </button>
           </form>
+
+          {mode === 'forgot' && (
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => setMode('signin')}
+                className="text-xs font-bold text-[#C86D51] hover:underline"
+              >
+                ← Back to Sign In
+              </button>
+            </div>
+          )}
 
           {/* Security notice */}
           <div className="pt-2 border-t border-[#F5F2EB] flex items-center justify-between text-[11px] text-[#8C7E6D]">

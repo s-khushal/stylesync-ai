@@ -1,0 +1,2133 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StyleSync — Intelligent Digital Wardrobe & AI Styling Studio</title>
+  
+  <!-- Google Fonts: Playfair Display & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..800;1,400..800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            canvas: '#FAF8F5',
+            surface: '#FFFFFF',
+            card: '#FFFDF9',
+            ink: '#1A1A1A',
+            'ink-soft': '#2B2621',
+            muted: '#5C5245',
+            subtle: '#8C7E6D',
+            terracotta: '#C86D51',
+            'terracotta-dark': '#AF553A',
+            'terracotta-light': '#F8ECE7',
+            sand: '#EFE9E0',
+            cream: '#F5EFE6',
+            border: '#EDE5DA',
+            'border-subtle': '#F2ECE4',
+            sage: '#4A5D4E',
+            gold: '#C5A880'
+          },
+          fontFamily: {
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          boxShadow: {
+            'subtle': '0 2px 10px rgba(26, 26, 26, 0.04)',
+            'elevated': '0 8px 30px rgba(26, 26, 26, 0.08)',
+            'floating': '0 20px 40px rgba(26, 26, 26, 0.12)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Custom styling for luxury aesthetic */
+    ::selection {
+      background-color: #E8D8C8;
+      color: #1A1A1A;
+    }
+    
+    /* Smooth tab transition */
+    .tab-content {
+      display: none;
+      opacity: 0;
+      transition: opacity 0.25s ease-in-out;
+    }
+    .tab-content.active {
+      display: block;
+      opacity: 1;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #FAF8F5;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #D8CEBE;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #B5A998;
+    }
+
+    /* Image zoom container */
+    .img-zoom {
+      overflow: hidden;
+    }
+    .img-zoom img {
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .img-zoom:hover img {
+      transform: scale(1.05);
+    }
+
+    /* Shimmer loading simulation */
+    @keyframes pulse-subtle {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    .animate-pulse-subtle {
+      animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+  </style>
+</head>
+<body class="bg-canvas text-ink font-sans antialiased selection:bg-[#E8D8C8] flex flex-col min-h-screen">
+
+  <!-- ========================================================================= -->
+  <!-- 1. TOP STARTUP ANNOUNCEMENT BAR (Zero College/Academic Content)           -->
+  <!-- ========================================================================= -->
+  <div class="bg-ink text-[#EDE7DF] text-xs py-2 px-4 sm:px-8 border-b border-[#332C26] flex items-center justify-between">
+    <div class="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
+      <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-terracotta text-white font-bold text-[10px] tracking-wider uppercase">
+        Early Access
+      </span>
+      <span class="hidden sm:inline text-[#D4C9BC]">
+        Experience algorithmic capsule wardrobe curation & personal styling.
+      </span>
+      <span class="sm:hidden text-[11px] text-[#D4C9BC]">
+        Smart Wardrobe & AI Styling Studio
+      </span>
+    </div>
+    <div class="flex items-center gap-4 text-[11px] text-[#B8ACA0] shrink-0">
+      <span class="hidden md:inline-flex items-center gap-1">
+        <i data-lucide="sparkles" class="w-3 h-3 text-terracotta"></i> Free Capsule Audit
+      </span>
+      <span class="inline-flex items-center gap-1.5 text-emerald-400 font-medium">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+        Styling Studio Live
+      </span>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 2. LUXURY NAVIGATION HEADER                                               -->
+  <!-- ========================================================================= -->
+  <header class="sticky top-0 z-40 bg-canvas/95 backdrop-blur-md border-b border-border transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <a href="javascript:void(0)" onclick="switchTab('home')" class="cursor-pointer flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-ink to-[#3A332C] flex items-center justify-center text-white shadow-subtle group-hover:scale-105 transition-transform">
+          <span class="font-serif text-2xl italic font-bold">S</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="font-serif text-2xl font-bold tracking-tight text-ink leading-tight">
+            StyleSync
+          </span>
+          <span class="text-[10px] tracking-wider text-subtle uppercase font-semibold">
+            Your Wardrobe. Your Style. Smarter Choices.
+          </span>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation Menu (Startup Oriented) -->
+      <nav class="hidden lg:flex items-center gap-1 xl:gap-1.5">
+        <button onclick="switchTab('home')" id="nav-btn-home" class="nav-link px-3.5 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-1.5 bg-white text-ink shadow-sm border border-border font-semibold">
+          <i data-lucide="compass" class="w-4 h-4 text-terracotta"></i>
+          Discover
+        </button>
+
+        <button onclick="switchTab('stylist')" id="nav-btn-stylist" class="nav-link px-3.5 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-1.5 text-muted hover:text-ink hover:bg-sand/60">
+          <i data-lucide="sparkles" class="w-4 h-4 text-terracotta"></i>
+          AI Stylist
+        </button>
+
+        <button onclick="switchTab('shop')" id="nav-btn-shop" class="nav-link px-3.5 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-1.5 text-muted hover:text-ink hover:bg-sand/60">
+          <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+          Curated Shop
+        </button>
+
+        <button onclick="switchTab('wardrobe')" id="nav-btn-wardrobe" class="nav-link px-3.5 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-1.5 text-muted hover:text-ink hover:bg-sand/60">
+          <i data-lucide="layers" class="w-4 h-4"></i>
+          My Wardrobe
+        </button>
+
+        <button onclick="switchTab('builder')" id="nav-btn-builder" class="nav-link px-3.5 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-1.5 text-muted hover:text-ink hover:bg-sand/60">
+          <i data-lucide="palette" class="w-4 h-4"></i>
+          Outfit Canvas
+        </button>
+
+        <button onclick="switchTab('planner')" id="nav-btn-planner" class="nav-link px-3.5 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-1.5 text-muted hover:text-ink hover:bg-sand/60">
+          <i data-lucide="calendar" class="w-4 h-4"></i>
+          Weekly Planner
+        </button>
+
+        <button onclick="switchTab('about')" id="nav-btn-about" class="nav-link px-3.5 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-1.5 text-muted hover:text-ink hover:bg-sand/60">
+          <i data-lucide="sparkle" class="w-4 h-4"></i>
+          Philosophy
+        </button>
+      </nav>
+
+      <!-- Right Header Actions -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Wishlist -->
+        <button onclick="openWishlist()" class="p-2.5 rounded-xl text-muted hover:text-ink hover:bg-sand/60 transition-colors relative" title="Wishlist">
+          <i data-lucide="heart" class="w-5 h-5"></i>
+          <span id="wishlist-badge" class="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-terracotta text-white text-[10px] font-bold flex items-center justify-center">
+            3
+          </span>
+        </button>
+
+        <!-- Shopping Bag -->
+        <button onclick="toggleCartDrawer(true)" class="flex items-center gap-2 py-2 px-3.5 rounded-xl bg-ink text-white hover:bg-black transition-all shadow-subtle group">
+          <i data-lucide="shopping-bag" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
+          <span class="text-xs font-semibold hidden sm:inline">Bag</span>
+          <span id="cart-badge" class="bg-terracotta text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+            2
+          </span>
+        </button>
+
+        <!-- Mock User Account Pill -->
+        <div class="relative hidden sm:block">
+          <div class="flex items-center gap-2 py-1.5 px-3 rounded-xl bg-surface border border-border text-ink text-xs font-semibold shadow-subtle">
+            <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-terracotta to-gold text-white flex items-center justify-center text-[10px] font-bold">
+              A
+            </div>
+            <span class="max-w-[80px] truncate">Aanya S.</span>
+            <span class="px-1.5 py-0.5 rounded text-[9px] bg-terracotta-light text-terracotta font-bold">Capsule</span>
+          </div>
+        </div>
+
+        <!-- Mobile Menu Trigger -->
+        <button onclick="toggleMobileMenu()" class="lg:hidden p-2 rounded-xl text-ink hover:bg-sand/60">
+          <i data-lucide="menu" id="mobile-menu-icon" class="w-6 h-6"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div id="mobile-drawer" class="hidden lg:hidden bg-canvas border-b border-border px-4 pt-3 pb-6 space-y-2 shadow-elevated">
+      <button onclick="switchTab('home'); toggleMobileMenu(false);" class="w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-medium flex items-center gap-3 text-ink bg-white border border-border">
+        <i data-lucide="compass" class="w-4 h-4 text-terracotta"></i> Discover & Feed
+      </button>
+      <button onclick="switchTab('stylist'); toggleMobileMenu(false);" class="w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-medium flex items-center gap-3 text-muted hover:bg-sand/60">
+        <i data-lucide="sparkles" class="w-4 h-4 text-terracotta"></i> AI Stylist Studio
+      </button>
+      <button onclick="switchTab('shop'); toggleMobileMenu(false);" class="w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-medium flex items-center gap-3 text-muted hover:bg-sand/60">
+        <i data-lucide="shopping-bag" class="w-4 h-4"></i> Curated Shop & Drops
+      </button>
+      <button onclick="switchTab('wardrobe'); toggleMobileMenu(false);" class="w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-medium flex items-center gap-3 text-muted hover:bg-sand/60">
+        <i data-lucide="layers" class="w-4 h-4"></i> My Digital Wardrobe
+      </button>
+      <button onclick="switchTab('builder'); toggleMobileMenu(false);" class="w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-medium flex items-center gap-3 text-muted hover:bg-sand/60">
+        <i data-lucide="palette" class="w-4 h-4"></i> Outfit Canvas Studio
+      </button>
+      <button onclick="switchTab('planner'); toggleMobileMenu(false);" class="w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-medium flex items-center gap-3 text-muted hover:bg-sand/60">
+        <i data-lucide="calendar" class="w-4 h-4"></i> Weekly Outfit Planner
+      </button>
+      <button onclick="switchTab('about'); toggleMobileMenu(false);" class="w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-medium flex items-center gap-3 text-muted hover:bg-sand/60">
+        <i data-lucide="sparkle" class="w-4 h-4"></i> Brand Philosophy
+      </button>
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- 3. MAIN INTERACTIVE CONTENT AREA                                          -->
+  <!-- ========================================================================= -->
+  <main class="flex-1">
+
+    <!-- --------------------------------------------------------------------- -->
+    <!-- TAB 1: HOME & EDITORIAL DISCOVERY                                     -->
+    <!-- --------------------------------------------------------------------- -->
+    <div id="tab-home" class="tab-content active space-y-20 pb-20">
+      
+      <!-- HERO EDITORIAL SHOWCASE -->
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-14">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          
+          <!-- Hero Copy -->
+          <div class="lg:col-span-7 space-y-6">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cream border border-border text-xs font-semibold text-terracotta-dark">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-terracotta"></i>
+              <span>Intelligent Wardrobe Architecture • Fall / Winter '26</span>
+            </div>
+
+            <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-ink leading-[1.12]">
+              Your Closet, Curated. <br />
+              <span class="italic font-normal text-terracotta">Smarter Choices Every Day.</span>
+            </h1>
+
+            <p class="text-base sm:text-lg text-muted leading-relaxed max-w-xl font-normal">
+              StyleSync bridges the gap between physical wardrobes and algorithmic styling. Digitize what you own, discover versatile essentials, and eliminate daily outfit decision fatigue.
+            </p>
+
+            <!-- Action Buttons -->
+            <div class="pt-2 flex flex-wrap gap-4 items-center">
+              <button onclick="switchTab('stylist')" class="py-4 px-7 rounded-2xl bg-ink hover:bg-black text-white text-xs font-bold tracking-wider uppercase transition-all shadow-elevated hover:-translate-y-0.5 flex items-center gap-2.5 group">
+                <i data-lucide="sparkles" class="w-4 h-4 text-terracotta group-hover:rotate-12 transition-transform"></i>
+                <span>Launch AI Stylist</span>
+                <i data-lucide="arrow-right" class="w-4 h-4 text-subtle group-hover:translate-x-1 transition-transform"></i>
+              </button>
+
+              <button onclick="switchTab('wardrobe')" class="py-4 px-7 rounded-2xl bg-surface hover:bg-cream border border-border text-ink text-xs font-bold tracking-wider uppercase transition-all shadow-subtle flex items-center gap-2">
+                <i data-lucide="layers" class="w-4 h-4 text-terracotta"></i>
+                <span>Open Digital Closet</span>
+              </button>
+            </div>
+
+            <!-- Live Startup Stats Badge -->
+            <div class="pt-6 grid grid-cols-3 gap-4 border-t border-border/80 max-w-lg">
+              <div>
+                <p class="font-serif text-2xl font-bold text-ink">10,000+</p>
+                <p class="text-xs text-subtle mt-0.5">Outfits Generated</p>
+              </div>
+              <div>
+                <p class="font-serif text-2xl font-bold text-terracotta">94%</p>
+                <p class="text-xs text-subtle mt-0.5">Color Harmony Avg.</p>
+              </div>
+              <div>
+                <p class="font-serif text-2xl font-bold text-ink">3.5x</p>
+                <p class="text-xs text-subtle mt-0.5">More Wear Per Item</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hero Fashion Image & Interactive Card -->
+          <div class="lg:col-span-5 relative">
+            <div class="relative mx-auto max-w-md lg:max-w-none">
+              <!-- Background Accent Glow -->
+              <div class="absolute -top-6 -right-6 w-72 h-72 rounded-full bg-cream blur-3xl opacity-80 -z-10"></div>
+              
+              <!-- Main Fashion Photography Card -->
+              <div class="img-zoom rounded-3xl overflow-hidden shadow-floating border border-border bg-surface aspect-[4/5]">
+                <img 
+                  src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1200&q=80" 
+                  alt="StyleSync Editorial Outfit Photography" 
+                  class="w-full h-full object-cover object-center"
+                />
+              </div>
+
+              <!-- Floating Live Outfit Match Card -->
+              <div class="absolute -bottom-6 -left-6 sm:bottom-6 sm:-left-8 bg-surface/95 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-border shadow-elevated max-w-[270px] space-y-2 animate-in fade-in">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-terracotta bg-terracotta-light px-2 py-0.5 rounded-full">
+                    AI Match 96%
+                  </span>
+                  <span class="text-[11px] text-subtle">Smart Casual</span>
+                </div>
+                <h4 class="font-serif text-sm font-bold text-ink">Parisian Minimalist Look</h4>
+                <div class="flex items-center gap-1.5 pt-1">
+                  <span class="w-3.5 h-3.5 rounded-full bg-[#E5D7C5] border border-black/10" title="Warm Sand"></span>
+                  <span class="w-3.5 h-3.5 rounded-full bg-[#342E28] border border-black/10" title="Espresso"></span>
+                  <span class="w-3.5 h-3.5 rounded-full bg-[#FAF7F2] border border-black/10" title="Ivory Linen"></span>
+                  <span class="text-[10px] text-muted ml-auto font-medium">3 Owned • 1 New</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- OCCASION MOOD CURATION (Lifestyle based, not college) -->
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-10 space-y-2">
+          <span class="text-xs font-bold uppercase tracking-widest text-terracotta">
+            Occasion Intelligence
+          </span>
+          <h2 class="font-serif text-3xl sm:text-4xl font-bold text-ink">
+            Curated For How You Actually Live
+          </h2>
+          <p class="text-xs sm:text-sm text-muted">
+            Whether leading high-stakes meetings or relaxing over Sunday brunch, discover outfits tailored to the mood and dress code.
+          </p>
+        </div>
+
+        <!-- Occasion Filter Tabs -->
+        <div class="flex flex-wrap items-center justify-center gap-2 mb-10">
+          <button onclick="filterOccasion(this, 'all')" class="occasion-chip active px-4 py-2 rounded-full text-xs font-bold transition-all bg-ink text-white shadow-subtle">
+            All Curations
+          </button>
+          <button onclick="filterOccasion(this, 'work')" class="occasion-chip px-4 py-2 rounded-full text-xs font-bold transition-all bg-surface hover:bg-cream border border-border text-muted">
+            Work & Creative Meetings
+          </button>
+          <button onclick="filterOccasion(this, 'brunch')" class="occasion-chip px-4 py-2 rounded-full text-xs font-bold transition-all bg-surface hover:bg-cream border border-border text-muted">
+            Weekend Social & Brunch
+          </button>
+          <button onclick="filterOccasion(this, 'evening')" class="occasion-chip px-4 py-2 rounded-full text-xs font-bold transition-all bg-surface hover:bg-cream border border-border text-muted">
+            Cocktail & Evening Chic
+          </button>
+          <button onclick="filterOccasion(this, 'travel')" class="occasion-chip px-4 py-2 rounded-full text-xs font-bold transition-all bg-surface hover:bg-cream border border-border text-muted">
+            Resort & Travel Getaway
+          </button>
+        </div>
+
+        <!-- Curated Lookbook Cards Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" id="lookbook-grid">
+          
+          <!-- Card 1 -->
+          <div class="lookbook-item group bg-surface rounded-3xl overflow-hidden border border-border shadow-subtle hover:shadow-elevated transition-all flex flex-col" data-cat="work">
+            <div class="img-zoom relative aspect-[4/5] bg-cream">
+              <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80" alt="Tailored Smart Casual Look" class="w-full h-full object-cover">
+              <div class="absolute top-4 left-4 bg-surface/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold text-ink uppercase tracking-wider border border-border">
+                Tailored Ease
+              </div>
+              <button onclick="toggleLookLike(this)" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-surface/90 backdrop-blur-md flex items-center justify-center text-ink hover:text-terracotta transition-colors shadow-subtle">
+                <i data-lucide="heart" class="w-4 h-4"></i>
+              </button>
+            </div>
+            <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
+              <div>
+                <div class="flex items-center justify-between text-xs text-subtle mb-1">
+                  <span>Work & Creative Meetings</span>
+                  <span class="text-terracotta font-semibold">98% Fit Score</span>
+                </div>
+                <h3 class="font-serif text-lg font-bold text-ink group-hover:text-terracotta transition-colors">
+                  Structured Sand Blazer & Ivory Knit
+                </h3>
+                <p class="text-xs text-muted mt-1 leading-relaxed">
+                  Relaxed double-breasted silhouette balanced with breathable ribbed knit and tapered wool trousers.
+                </p>
+              </div>
+              <div class="pt-3 border-t border-border-subtle flex items-center justify-between">
+                <span class="font-serif text-base font-bold text-ink">₹6,890 <span class="text-xs font-normal text-subtle">look total</span></span>
+                <button onclick="openLookModal('Structured Sand Blazer & Ivory Knit', 'Work & Creative Meetings', '₹6,890', 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80')" class="px-3.5 py-1.5 rounded-xl bg-canvas hover:bg-cream border border-border text-xs font-bold text-ink transition-colors flex items-center gap-1.5">
+                  <span>Inspect Pieces</span>
+                  <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-terracotta"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="lookbook-item group bg-surface rounded-3xl overflow-hidden border border-border shadow-subtle hover:shadow-elevated transition-all flex flex-col" data-cat="brunch">
+            <div class="img-zoom relative aspect-[4/5] bg-cream">
+              <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80" alt="Casual Sunday Palette" class="w-full h-full object-cover">
+              <div class="absolute top-4 left-4 bg-surface/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold text-ink uppercase tracking-wider border border-border">
+                Weekend Casual
+              </div>
+              <button onclick="toggleLookLike(this)" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-surface/90 backdrop-blur-md flex items-center justify-center text-ink hover:text-terracotta transition-colors shadow-subtle">
+                <i data-lucide="heart" class="w-4 h-4"></i>
+              </button>
+            </div>
+            <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
+              <div>
+                <div class="flex items-center justify-between text-xs text-subtle mb-1">
+                  <span>Weekend Social & Brunch</span>
+                  <span class="text-terracotta font-semibold">95% Fit Score</span>
+                </div>
+                <h3 class="font-serif text-lg font-bold text-ink group-hover:text-terracotta transition-colors">
+                  Warm Ochre & Relaxed Ecru Denim
+                </h3>
+                <p class="text-xs text-muted mt-1 leading-relaxed">
+                  Effortless sunshine tone layered over high-waisted ecru wide-leg jeans with minimal leather slides.
+                </p>
+              </div>
+              <div class="pt-3 border-t border-border-subtle flex items-center justify-between">
+                <span class="font-serif text-base font-bold text-ink">₹4,450 <span class="text-xs font-normal text-subtle">look total</span></span>
+                <button onclick="openLookModal('Warm Ochre & Relaxed Ecru Denim', 'Weekend Social & Brunch', '₹4,450', 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80')" class="px-3.5 py-1.5 rounded-xl bg-canvas hover:bg-cream border border-border text-xs font-bold text-ink transition-colors flex items-center gap-1.5">
+                  <span>Inspect Pieces</span>
+                  <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-terracotta"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="lookbook-item group bg-surface rounded-3xl overflow-hidden border border-border shadow-subtle hover:shadow-elevated transition-all flex flex-col" data-cat="evening">
+            <div class="img-zoom relative aspect-[4/5] bg-cream">
+              <img src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=800&q=80" alt="Monochrome Evening Look" class="w-full h-full object-cover">
+              <div class="absolute top-4 left-4 bg-surface/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold text-ink uppercase tracking-wider border border-border">
+                Evening Sleek
+              </div>
+              <button onclick="toggleLookLike(this)" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-surface/90 backdrop-blur-md flex items-center justify-center text-ink hover:text-terracotta transition-colors shadow-subtle">
+                <i data-lucide="heart" class="w-4 h-4"></i>
+              </button>
+            </div>
+            <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
+              <div>
+                <div class="flex items-center justify-between text-xs text-subtle mb-1">
+                  <span>Cocktail & Evening Chic</span>
+                  <span class="text-terracotta font-semibold">97% Fit Score</span>
+                </div>
+                <h3 class="font-serif text-lg font-bold text-ink group-hover:text-terracotta transition-colors">
+                  Charcoal Wool Long Coat & Heeled Boots
+                </h3>
+                <p class="text-xs text-muted mt-1 leading-relaxed">
+                  Monochrome elegance with sharp lapels, brushed brass jewelry accents, and structured leather crossbody bag.
+                </p>
+              </div>
+              <div class="pt-3 border-t border-border-subtle flex items-center justify-between">
+                <span class="font-serif text-base font-bold text-ink">₹8,990 <span class="text-xs font-normal text-subtle">look total</span></span>
+                <button onclick="openLookModal('Charcoal Wool Long Coat & Heeled Boots', 'Cocktail & Evening Chic', '₹8,990', 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=800&q=80')" class="px-3.5 py-1.5 rounded-xl bg-canvas hover:bg-cream border border-border text-xs font-bold text-ink transition-colors flex items-center gap-1.5">
+                  <span>Inspect Pieces</span>
+                  <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-terracotta"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 4 -->
+          <div class="lookbook-item group bg-surface rounded-3xl overflow-hidden border border-border shadow-subtle hover:shadow-elevated transition-all flex flex-col" data-cat="travel">
+            <div class="img-zoom relative aspect-[4/5] bg-cream">
+              <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=800&q=80" alt="Resort Linen Outfit" class="w-full h-full object-cover">
+              <div class="absolute top-4 left-4 bg-surface/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold text-ink uppercase tracking-wider border border-border">
+                Resort Minimal
+              </div>
+              <button onclick="toggleLookLike(this)" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-surface/90 backdrop-blur-md flex items-center justify-center text-ink hover:text-terracotta transition-colors shadow-subtle">
+                <i data-lucide="heart" class="w-4 h-4"></i>
+              </button>
+            </div>
+            <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
+              <div>
+                <div class="flex items-center justify-between text-xs text-subtle mb-1">
+                  <span>Resort & Travel Getaway</span>
+                  <span class="text-terracotta font-semibold">93% Fit Score</span>
+                </div>
+                <h3 class="font-serif text-lg font-bold text-ink group-hover:text-terracotta transition-colors">
+                  Organic Linen Co-Ord & Woven Tote
+                </h3>
+                <p class="text-xs text-muted mt-1 leading-relaxed">
+                  Breezy natural fibers in terracotta and sand hues engineered for tropical getaways and seaside afternoons.
+                </p>
+              </div>
+              <div class="pt-3 border-t border-border-subtle flex items-center justify-between">
+                <span class="font-serif text-base font-bold text-ink">₹5,200 <span class="text-xs font-normal text-subtle">look total</span></span>
+                <button onclick="openLookModal('Organic Linen Co-Ord & Woven Tote', 'Resort & Travel Getaway', '₹5,200', 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=800&q=80')" class="px-3.5 py-1.5 rounded-xl bg-canvas hover:bg-cream border border-border text-xs font-bold text-ink transition-colors flex items-center gap-1.5">
+                  <span>Inspect Pieces</span>
+                  <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-terracotta"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 5 -->
+          <div class="lookbook-item group bg-surface rounded-3xl overflow-hidden border border-border shadow-subtle hover:shadow-elevated transition-all flex flex-col" data-cat="work">
+            <div class="img-zoom relative aspect-[4/5] bg-cream">
+              <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=800&q=80" alt="Quiet Luxury Trench Look" class="w-full h-full object-cover">
+              <div class="absolute top-4 left-4 bg-surface/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold text-ink uppercase tracking-wider border border-border">
+                Quiet Luxury
+              </div>
+              <button onclick="toggleLookLike(this)" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-surface/90 backdrop-blur-md flex items-center justify-center text-ink hover:text-terracotta transition-colors shadow-subtle">
+                <i data-lucide="heart" class="w-4 h-4"></i>
+              </button>
+            </div>
+            <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
+              <div>
+                <div class="flex items-center justify-between text-xs text-subtle mb-1">
+                  <span>Work & Creative Meetings</span>
+                  <span class="text-terracotta font-semibold">99% Fit Score</span>
+                </div>
+                <h3 class="font-serif text-lg font-bold text-ink group-hover:text-terracotta transition-colors">
+                  Camel Wool Trench & Silk Slip
+                </h3>
+                <p class="text-xs text-muted mt-1 leading-relaxed">
+                  Timeless outerwear over flowing midi silk, paired with handcrafted leather mules and structured eyewear.
+                </p>
+              </div>
+              <div class="pt-3 border-t border-border-subtle flex items-center justify-between">
+                <span class="font-serif text-base font-bold text-ink">₹9,450 <span class="text-xs font-normal text-subtle">look total</span></span>
+                <button onclick="openLookModal('Camel Wool Trench & Silk Slip', 'Work & Creative Meetings', '₹9,450', 'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=800&q=80')" class="px-3.5 py-1.5 rounded-xl bg-canvas hover:bg-cream border border-border text-xs font-bold text-ink transition-colors flex items-center gap-1.5">
+                  <span>Inspect Pieces</span>
+                  <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-terracotta"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 6 -->
+          <div class="lookbook-item group bg-surface rounded-3xl overflow-hidden border border-border shadow-subtle hover:shadow-elevated transition-all flex flex-col" data-cat="brunch">
+            <div class="img-zoom relative aspect-[4/5] bg-cream">
+              <img src="https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=800&q=80" alt="Contemporary Street Casual" class="w-full h-full object-cover">
+              <div class="absolute top-4 left-4 bg-surface/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold text-ink uppercase tracking-wider border border-border">
+                City Streetwear
+              </div>
+              <button onclick="toggleLookLike(this)" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-surface/90 backdrop-blur-md flex items-center justify-center text-ink hover:text-terracotta transition-colors shadow-subtle">
+                <i data-lucide="heart" class="w-4 h-4"></i>
+              </button>
+            </div>
+            <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
+              <div>
+                <div class="flex items-center justify-between text-xs text-subtle mb-1">
+                  <span>Weekend Social & Brunch</span>
+                  <span class="text-terracotta font-semibold">92% Fit Score</span>
+                </div>
+                <h3 class="font-serif text-lg font-bold text-ink group-hover:text-terracotta transition-colors">
+                  Clean Neutral Streetwear Set
+                </h3>
+                <p class="text-xs text-muted mt-1 leading-relaxed">
+                  Boxy crewneck fleece combined with relaxed utility cargo pants and vintage white leather runners.
+                </p>
+              </div>
+              <div class="pt-3 border-t border-border-subtle flex items-center justify-between">
+                <span class="font-serif text-base font-bold text-ink">₹3,890 <span class="text-xs font-normal text-subtle">look total</span></span>
+                <button onclick="openLookModal('Clean Neutral Streetwear Set', 'Weekend Social & Brunch', '₹3,890', 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=800&q=80')" class="px-3.5 py-1.5 rounded-xl bg-canvas hover:bg-cream border border-border text-xs font-bold text-ink transition-colors flex items-center gap-1.5">
+                  <span>Inspect Pieces</span>
+                  <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-terracotta"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- 4-STEP STARTUP PRODUCT ARCHITECTURE -->
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-surface rounded-3xl p-8 sm:p-14 border border-border shadow-subtle space-y-12">
+          <div class="text-center max-w-2xl mx-auto space-y-2">
+            <span class="text-xs font-bold uppercase tracking-widest text-terracotta">
+              Algorithmic Wardrobe Flow
+            </span>
+            <h2 class="font-serif text-3xl sm:text-4xl font-bold text-ink">
+              How StyleSync Works
+            </h2>
+            <p class="text-xs sm:text-sm text-muted leading-relaxed">
+              Transforming scattered clothes and impulse shopping into an intentional, highly versatile personal aesthetic.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="space-y-3 p-5 rounded-2xl bg-canvas border border-border hover:border-terracotta transition-colors">
+              <div class="w-10 h-10 rounded-xl bg-ink text-white flex items-center justify-center font-bold text-sm">
+                01
+              </div>
+              <h3 class="font-serif text-base font-bold text-ink">Digitize What You Own</h3>
+              <p class="text-xs text-muted leading-relaxed">
+                Snap or upload items from your closet. Our smart catalog automatically tags color palettes, fit, and seasonality.
+              </p>
+            </div>
+
+            <div class="space-y-3 p-5 rounded-2xl bg-canvas border border-border hover:border-terracotta transition-colors">
+              <div class="w-10 h-10 rounded-xl bg-ink text-white flex items-center justify-center font-bold text-sm">
+                02
+              </div>
+              <h3 class="font-serif text-base font-bold text-ink">Define Your Occasion</h3>
+              <p class="text-xs text-muted leading-relaxed">
+                Select where you're headed—work conference, weekend escape, or intimate dinner—with your target budget.
+              </p>
+            </div>
+
+            <div class="space-y-3 p-5 rounded-2xl bg-canvas border border-border hover:border-terracotta transition-colors">
+              <div class="w-10 h-10 rounded-xl bg-ink text-white flex items-center justify-center font-bold text-sm">
+                03
+              </div>
+              <h3 class="font-serif text-base font-bold text-ink">Color & Harmony Scoring</h3>
+              <p class="text-xs text-muted leading-relaxed">
+                Our algorithmic engine matches pieces using real color temperature, silhouette balance, and texture contrast.
+              </p>
+            </div>
+
+            <div class="space-y-3 p-5 rounded-2xl bg-canvas border border-border hover:border-terracotta transition-colors">
+              <div class="w-10 h-10 rounded-xl bg-ink text-white flex items-center justify-center font-bold text-sm">
+                04
+              </div>
+              <h3 class="font-serif text-base font-bold text-ink">Schedule & Wear</h3>
+              <p class="text-xs text-muted leading-relaxed">
+                Assign curated looks to your weekly calendar. Step out every morning in 2 minutes with absolute style confidence.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CAPSULE PHILOSOPHY EDITORIAL BANNER -->
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="relative bg-ink-soft text-white rounded-3xl overflow-hidden shadow-floating border border-[#3E342B] p-8 sm:p-14">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div class="lg:col-span-7 space-y-4">
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-terracotta text-white text-[10px] font-bold uppercase tracking-wider">
+                <i data-lucide="leaf" class="w-3 h-3"></i> Conscious Fashion Technology
+              </div>
+              <h2 class="font-serif text-3xl sm:text-4xl font-bold leading-tight">
+                Wear More. Buy Smarter. <br />
+                <span class="text-gold font-normal italic">The Capsule Wardrobe Algorithm.</span>
+              </h2>
+              <p class="text-xs sm:text-sm text-[#C8BCAC] leading-relaxed max-w-xl">
+                The average person wears only 20% of their closet 80% of the time. StyleSync optimizes item reusability, proving that 12 intentional, well-coordinated pieces can generate over 48 distinct, elevated looks.
+              </p>
+              <div class="pt-2 flex flex-wrap gap-4">
+                <button onclick="switchTab('stylist')" class="py-3 px-6 rounded-xl bg-white text-ink text-xs font-bold uppercase tracking-wider hover:bg-cream transition-colors">
+                  Try AI Capsule Generator
+                </button>
+                <button onclick="switchTab('about')" class="py-3 px-6 rounded-xl bg-[#3D352E] text-white text-xs font-bold uppercase tracking-wider border border-[#52463B] hover:bg-[#4D4238] transition-colors">
+                  Read Our Philosophy
+                </button>
+              </div>
+            </div>
+            <div class="lg:col-span-5">
+              <div class="img-zoom rounded-2xl overflow-hidden border border-[#52463B] shadow-elevated aspect-[4/3]">
+                <img src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?auto=format&fit=crop&w=800&q=80" alt="Capsule Wardrobe rack" class="w-full h-full object-cover">
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- --------------------------------------------------------------------- -->
+    <!-- TAB 2: AI STYLIST STUDIO                                              -->
+    <!-- --------------------------------------------------------------------- -->
+    <div id="tab-stylist" class="tab-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+      
+      <!-- Studio Header -->
+      <div class="text-center max-w-3xl mx-auto space-y-3">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cream border border-border text-xs font-semibold text-terracotta">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+          <span>Interactive AI Styling Engine</span>
+        </div>
+        <h1 class="font-serif text-3xl sm:text-5xl font-bold text-ink">
+          Personal Styling Studio
+        </h1>
+        <p class="text-xs sm:text-sm text-muted leading-relaxed">
+          Select your destination, desired aesthetic, and comfort budget. Our algorithmic engine pairs pieces from your existing closet with complementary statement essentials.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+        
+        <!-- Left: Styling Parameter Controls -->
+        <div class="lg:col-span-5 bg-surface rounded-3xl p-6 sm:p-8 border border-border shadow-subtle space-y-6">
+          <h2 class="font-serif text-lg font-bold text-ink flex items-center gap-2">
+            <i data-lucide="sliders" class="w-4 h-4 text-terracotta"></i>
+            Styling Parameters
+          </h2>
+
+          <!-- Occasion Selection -->
+          <div class="space-y-2">
+            <label class="block text-xs font-bold uppercase tracking-wider text-muted">
+              Select Occasion
+            </label>
+            <div class="grid grid-cols-2 gap-2" id="stylist-occasion-pills">
+              <button onclick="setStylistParam('occasion', 'Smart Casual Office', this)" class="param-pill active py-2.5 px-3 rounded-xl border border-border text-xs font-medium text-left bg-ink text-white font-bold">
+                💼 Smart Casual Office
+              </button>
+              <button onclick="setStylistParam('occasion', 'Weekend Brunch', this)" class="param-pill py-2.5 px-3 rounded-xl border border-border text-xs font-medium text-left bg-canvas text-ink hover:bg-cream">
+                🥐 Weekend Brunch
+              </button>
+              <button onclick="setStylistParam('occasion', 'Cocktail Evening', this)" class="param-pill py-2.5 px-3 rounded-xl border border-border text-xs font-medium text-left bg-canvas text-ink hover:bg-cream">
+                🍸 Cocktail & Evening
+              </button>
+              <button onclick="setStylistParam('occasion', 'Airport & Travel', this)" class="param-pill py-2.5 px-3 rounded-xl border border-border text-xs font-medium text-left bg-canvas text-ink hover:bg-cream">
+                ✈️ Airport & Travel
+              </button>
+            </div>
+          </div>
+
+          <!-- Aesthetic Vibe -->
+          <div class="space-y-2">
+            <label class="block text-xs font-bold uppercase tracking-wider text-muted">
+              Aesthetic Vibe
+            </label>
+            <div class="grid grid-cols-2 gap-2" id="stylist-aesthetic-pills">
+              <button onclick="setStylistParam('aesthetic', 'Minimalist Quiet Luxury', this)" class="param-pill active py-2.5 px-3 rounded-xl border border-border text-xs font-medium text-left bg-ink text-white font-bold">
+                Minimalist Quiet Luxury
+              </button>
+              <button onclick="setStylistParam('aesthetic', 'Warm Earthy Tones', this)" class="param-pill py-2.5 px-3 rounded-xl border border-border text-xs font-medium text-left bg-canvas text-ink hover:bg-cream">
+                Warm Earthy Tones
+              </button>
+              <button onclick="setStylistParam('aesthetic', 'Tailored Monochrome', this)" class="param-pill py-2.5 px-3 rounded-xl border border-border text-xs font-medium text-left bg-canvas text-ink hover:bg-cream">
+                Tailored Monochrome
+              </button>
+              <button onclick="setStylistParam('aesthetic', 'Contemporary Streetwear', this)" class="param-pill py-2.5 px-3 rounded-xl border border-border text-xs font-medium text-left bg-canvas text-ink hover:bg-cream">
+                Contemporary Street
+              </button>
+            </div>
+          </div>
+
+          <!-- Budget Range Tier -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-muted">
+              <span>Budget Cap</span>
+              <span id="budget-display" class="text-terracotta font-serif text-sm font-bold">₹5,000</span>
+            </div>
+            <input 
+              type="range" 
+              min="1500" 
+              max="12000" 
+              step="500" 
+              value="5000" 
+              oninput="document.getElementById('budget-display').innerText = '₹' + parseInt(this.value).toLocaleString('en-IN')"
+              class="w-full accent-terracotta bg-sand h-2 rounded-lg cursor-pointer"
+            >
+            <div class="flex justify-between text-[10px] text-subtle">
+              <span>Budget Conscious (₹1.5k)</span>
+              <span>Luxury Capsule (₹12k)</span>
+            </div>
+          </div>
+
+          <!-- Weather Toggle -->
+          <div class="space-y-2">
+            <label class="block text-xs font-bold uppercase tracking-wider text-muted">
+              Current Weather
+            </label>
+            <div class="flex gap-2">
+              <button onclick="setStylistParam('weather', 'Mild & Sunny', this)" class="weather-pill flex-1 py-2 rounded-xl border border-border text-xs font-medium bg-ink text-white font-bold">
+                ☀️ 26°C Sunny
+              </button>
+              <button onclick="setStylistParam('weather', 'Breezy Autumn', this)" class="weather-pill flex-1 py-2 rounded-xl border border-border text-xs font-medium bg-canvas text-ink hover:bg-cream">
+                🍂 18°C Breezy
+              </button>
+              <button onclick="setStylistParam('weather', 'Cool Evening', this)" class="weather-pill flex-1 py-2 rounded-xl border border-border text-xs font-medium bg-canvas text-ink hover:bg-cream">
+                🌙 14°C Cool
+              </button>
+            </div>
+          </div>
+
+          <!-- Generate Action Button -->
+          <button onclick="runStylistAlgorithm()" id="generate-outfit-btn" class="w-full py-4 rounded-2xl bg-terracotta hover:bg-terracotta-dark text-white font-bold text-xs uppercase tracking-wider transition-all shadow-elevated flex items-center justify-center gap-2 group">
+            <i data-lucide="sparkles" class="w-4 h-4 group-hover:rotate-12 transition-transform"></i>
+            <span>Generate Outfit Look</span>
+          </button>
+        </div>
+
+        <!-- Right: Generated Look Preview Card -->
+        <div class="lg:col-span-7 bg-surface rounded-3xl p-6 sm:p-8 border border-border shadow-elevated space-y-6 relative" id="stylist-result-card">
+          
+          <!-- Outfit Header & Match Score -->
+          <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-border">
+            <div>
+              <div class="inline-flex items-center gap-1.5 text-xs text-terracotta font-semibold mb-1">
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span id="result-occasion-tag">Smart Casual Office</span> • <span id="result-vibe-tag">Minimalist Quiet Luxury</span>
+              </div>
+              <h2 id="result-outfit-name" class="font-serif text-2xl font-bold text-ink">
+                Ivory Linen & Tailored Sand Ensemble
+              </h2>
+            </div>
+            <div class="text-right">
+              <span class="px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold">
+                96% Algorithmic Match
+              </span>
+              <p class="text-[11px] text-subtle mt-1">Palette Harmony: High</p>
+            </div>
+          </div>
+
+          <!-- Color Palette Chips -->
+          <div class="flex items-center gap-2 text-xs text-muted">
+            <span class="font-semibold text-ink">Harmonized Palette:</span>
+            <div class="flex items-center gap-1.5">
+              <span class="w-4 h-4 rounded-full bg-[#E8DDD1] border border-black/10" title="Warm Ivory"></span>
+              <span class="w-4 h-4 rounded-full bg-[#B39F8A] border border-black/10" title="Sand Taupe"></span>
+              <span class="w-4 h-4 rounded-full bg-[#36302A] border border-black/10" title="Deep Espresso"></span>
+              <span class="w-4 h-4 rounded-full bg-[#C86D51] border border-black/10" title="Terracotta Accent"></span>
+            </div>
+          </div>
+
+          <!-- 4-Piece Grid Breakdown -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4" id="stylist-pieces-grid">
+            
+            <!-- Piece 1: Top -->
+            <div class="bg-canvas p-3 rounded-2xl border border-border text-center space-y-2 group">
+              <div class="img-zoom aspect-square rounded-xl overflow-hidden bg-white">
+                <img src="https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=800&q=80" alt="Linen Shirt" class="w-full h-full object-cover">
+              </div>
+              <div>
+                <span class="text-[10px] uppercase font-bold text-subtle block">Top</span>
+                <p class="text-xs font-bold text-ink truncate">Linen Resort Shirt</p>
+                <p class="text-[11px] text-terracotta font-semibold">₹1,499</p>
+              </div>
+              <span class="inline-block text-[9px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">In Wardrobe</span>
+            </div>
+
+            <!-- Piece 2: Bottom -->
+            <div class="bg-canvas p-3 rounded-2xl border border-border text-center space-y-2 group">
+              <div class="img-zoom aspect-square rounded-xl overflow-hidden bg-white">
+                <img src="https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=800&q=80" alt="Pleated Trousers" class="w-full h-full object-cover">
+              </div>
+              <div>
+                <span class="text-[10px] uppercase font-bold text-subtle block">Bottom</span>
+                <p class="text-xs font-bold text-ink truncate">Pleated Trousers</p>
+                <p class="text-[11px] text-terracotta font-semibold">₹2,199</p>
+              </div>
+              <span class="inline-block text-[9px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">In Wardrobe</span>
+            </div>
+
+            <!-- Piece 3: Shoes -->
+            <div class="bg-canvas p-3 rounded-2xl border border-border text-center space-y-2 group">
+              <div class="img-zoom aspect-square rounded-xl overflow-hidden bg-white">
+                <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=800&q=80" alt="Minimalist Leather Sneaker" class="w-full h-full object-cover">
+              </div>
+              <div>
+                <span class="text-[10px] uppercase font-bold text-subtle block">Footwear</span>
+                <p class="text-xs font-bold text-ink truncate">Minimalist Sneaker</p>
+                <p class="text-[11px] text-terracotta font-semibold">₹2,299</p>
+              </div>
+              <span class="inline-block text-[9px] px-2 py-0.5 rounded bg-terracotta-light text-terracotta font-bold">Curated Add</span>
+            </div>
+
+            <!-- Piece 4: Outerwear/Accessory -->
+            <div class="bg-canvas p-3 rounded-2xl border border-border text-center space-y-2 group">
+              <div class="img-zoom aspect-square rounded-xl overflow-hidden bg-white">
+                <img src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80" alt="Leather Tote Bag" class="w-full h-full object-cover">
+              </div>
+              <div>
+                <span class="text-[10px] uppercase font-bold text-subtle block">Accessory</span>
+                <p class="text-xs font-bold text-ink truncate">Cognac Tote Bag</p>
+                <p class="text-[11px] text-terracotta font-semibold">₹1,299</p>
+              </div>
+              <span class="inline-block text-[9px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">In Wardrobe</span>
+            </div>
+
+          </div>
+
+          <!-- Stylist Rationale Note -->
+          <div class="p-4 rounded-2xl bg-canvas border border-border text-xs text-muted leading-relaxed">
+            <span class="font-bold text-ink block mb-0.5">Styling Architecture Note:</span>
+            Pairing the relaxed drape of the natural linen top against the structured pleats of the sand trouser creates effortless texture balance without looking stiff. The cognac tote grounds the neutrals with subtle warmth.
+          </div>
+
+          <!-- Action Bottom Bar -->
+          <div class="pt-4 border-t border-border flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <span class="text-xs text-subtle block">Total Outfit Cost</span>
+              <span class="font-serif text-xl font-bold text-ink">₹5,997 <span class="text-xs font-normal text-muted">(₹2,299 needed)</span></span>
+            </div>
+            <div class="flex items-center gap-3">
+              <button onclick="saveCuratedOutfit()" class="py-2.5 px-4 rounded-xl bg-canvas hover:bg-cream border border-border text-xs font-bold text-ink transition-colors flex items-center gap-1.5">
+                <i data-lucide="bookmark" class="w-3.5 h-3.5 text-terracotta"></i>
+                <span>Save Look</span>
+              </button>
+              <button onclick="addOutfitToBag()" class="py-2.5 px-5 rounded-xl bg-ink hover:bg-black text-white text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-2">
+                <i data-lucide="shopping-bag" class="w-3.5 h-3.5"></i>
+                <span>Add Missing to Bag</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- --------------------------------------------------------------------- -->
+    <!-- TAB 3: CURATED SHOP & DROPS                                           -->
+    <!-- --------------------------------------------------------------------- -->
+    <div id="tab-shop" class="tab-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+      
+      <!-- Shop Header -->
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-border">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-widest text-terracotta">
+            Curated Capsule Drops
+          </span>
+          <h1 class="font-serif text-3xl sm:text-4xl font-bold text-ink mt-1">
+            Wardrobe Essentials Catalogue
+          </h1>
+          <p class="text-xs sm:text-sm text-muted mt-1">
+            Versatile staple pieces engineered to integrate with your existing owned garments.
+          </p>
+        </div>
+
+        <!-- Search & Filter Controls -->
+        <div class="flex items-center gap-3">
+          <div class="relative">
+            <i data-lucide="search" class="w-4 h-4 text-subtle absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+            <input 
+              type="text" 
+              id="shop-search" 
+              oninput="filterShopProducts()" 
+              placeholder="Search linen, trousers, boots..." 
+              class="pl-9 pr-4 py-2 rounded-xl bg-surface border border-border text-xs focus:outline-none focus:ring-1 focus:ring-ink w-48 sm:w-64"
+            >
+          </div>
+          <select id="shop-sort" onchange="sortShopProducts()" class="py-2 px-3 rounded-xl bg-surface border border-border text-xs font-medium focus:outline-none">
+            <option value="featured">Featured Drops</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="rating">Highest Rated</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="filterShopCategory(this, 'all')" class="shop-filter active px-4 py-1.5 rounded-full text-xs font-bold bg-ink text-white">All Items (12)</button>
+        <button onclick="filterShopCategory(this, 'Shirts')" class="shop-filter px-4 py-1.5 rounded-full text-xs font-bold bg-surface border border-border text-muted hover:text-ink">Shirts & Tops</button>
+        <button onclick="filterShopCategory(this, 'Trousers')" class="shop-filter px-4 py-1.5 rounded-full text-xs font-bold bg-surface border border-border text-muted hover:text-ink">Trousers & Denim</button>
+        <button onclick="filterShopCategory(this, 'Outerwear')" class="shop-filter px-4 py-1.5 rounded-full text-xs font-bold bg-surface border border-border text-muted hover:text-ink">Outerwear & Blazers</button>
+        <button onclick="filterShopCategory(this, 'Footwear')" class="shop-filter px-4 py-1.5 rounded-full text-xs font-bold bg-surface border border-border text-muted hover:text-ink">Footwear</button>
+        <button onclick="filterShopCategory(this, 'Accessories')" class="shop-filter px-4 py-1.5 rounded-full text-xs font-bold bg-surface border border-border text-muted hover:text-ink">Bags & Accessories</button>
+      </div>
+
+      <!-- Product Cards Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="products-grid">
+        <!-- Dynamically rendered via JavaScript -->
+      </div>
+
+    </div>
+
+    <!-- --------------------------------------------------------------------- -->
+    <!-- TAB 4: MY DIGITAL WARDROBE                                            -->
+    <!-- --------------------------------------------------------------------- -->
+    <div id="tab-wardrobe" class="tab-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+      
+      <!-- Wardrobe Header & Metric Banner -->
+      <div class="bg-surface rounded-3xl p-6 sm:p-8 border border-border shadow-subtle flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-widest text-terracotta">
+            Digital Closet Architecture
+          </span>
+          <h1 class="font-serif text-3xl font-bold text-ink mt-1">
+            Aanya's Personal Wardrobe
+          </h1>
+          <p class="text-xs sm:text-sm text-muted mt-1">
+            18 garments cataloged • 84% Capsule utilization rate
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <div class="p-3 bg-canvas rounded-2xl border border-border text-center min-w-[100px]">
+            <span class="text-[10px] uppercase font-bold text-subtle block">Closet Value</span>
+            <span class="font-serif text-base font-bold text-ink">₹38,400</span>
+          </div>
+          <div class="p-3 bg-canvas rounded-2xl border border-border text-center min-w-[100px]">
+            <span class="text-[10px] uppercase font-bold text-subtle block">Avg Cost / Wear</span>
+            <span class="font-serif text-base font-bold text-terracotta">₹142</span>
+          </div>
+          <button onclick="openAddGarmentModal()" class="py-3 px-5 rounded-2xl bg-ink hover:bg-black text-white text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 shadow-subtle">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>Add Garment</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Wardrobe Filter Tabs -->
+      <div class="flex flex-wrap gap-2">
+        <button onclick="filterWardrobeCategory(this, 'all')" class="wardrobe-tab active px-4 py-1.5 rounded-full text-xs font-bold bg-ink text-white">All Items (8)</button>
+        <button onclick="filterWardrobeCategory(this, 'top')" class="wardrobe-tab px-4 py-1.5 rounded-full text-xs font-bold bg-surface border border-border text-muted">Tops (3)</button>
+        <button onclick="filterWardrobeCategory(this, 'bottom')" class="wardrobe-tab px-4 py-1.5 rounded-full text-xs font-bold bg-surface border border-border text-muted">Bottoms (2)</button>
+        <button onclick="filterWardrobeCategory(this, 'footwear')" class="wardrobe-tab px-4 py-1.5 rounded-full text-xs font-bold bg-surface border border-border text-muted">Shoes (2)</button>
+        <button onclick="filterWardrobeCategory(this, 'outerwear')" class="wardrobe-tab px-4 py-1.5 rounded-full text-xs font-bold bg-surface border border-border text-muted">Outerwear (1)</button>
+      </div>
+
+      <!-- Wardrobe Items Grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6" id="wardrobe-grid">
+        <!-- Rendered via JS -->
+      </div>
+
+    </div>
+
+    <!-- --------------------------------------------------------------------- -->
+    <!-- TAB 5: OUTFIT BUILDER (CANVAS STUDIO)                                 -->
+    <!-- --------------------------------------------------------------------- -->
+    <div id="tab-builder" class="tab-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+      
+      <div>
+        <span class="text-xs font-bold uppercase tracking-widest text-terracotta">
+          Visual Coordinate Engine
+        </span>
+        <h1 class="font-serif text-3xl font-bold text-ink mt-1">
+          Outfit Canvas Studio
+        </h1>
+        <p class="text-xs sm:text-sm text-muted mt-1">
+          Click garments from your palette to swap and test silhouettes on the visual styling canvas.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Left: Garment Palette (Selectable pieces) -->
+        <div class="lg:col-span-4 bg-surface rounded-3xl p-6 border border-border shadow-subtle space-y-4">
+          <div class="flex items-center justify-between pb-3 border-b border-border">
+            <h2 class="font-serif text-base font-bold text-ink">Garment Palette</h2>
+            <span class="text-xs text-subtle">Click to swap into canvas</span>
+          </div>
+
+          <div class="space-y-3 max-h-[520px] overflow-y-auto pr-1" id="builder-palette-list">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
+        <!-- Center: Interactive Styling Canvas -->
+        <div class="lg:col-span-5 bg-surface rounded-3xl p-6 border border-border shadow-elevated flex flex-col items-center justify-between min-h-[580px]">
+          <div class="w-full flex items-center justify-between pb-3 border-b border-border text-xs text-muted">
+            <span class="font-semibold text-ink">Visual Coordinate Layer</span>
+            <span class="text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full font-bold">Harmony 94%</span>
+          </div>
+
+          <!-- Canvas Mannequin Layout -->
+          <div class="w-full py-4 flex flex-col items-center justify-center space-y-4 max-w-xs">
+            <!-- Top Piece -->
+            <div id="canvas-top" class="w-44 h-32 rounded-2xl border border-border bg-canvas overflow-hidden shadow-subtle relative group cursor-pointer transition-transform hover:scale-105">
+              <img src="https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=400&q=80" class="w-full h-full object-cover">
+              <span class="absolute bottom-1 right-1 bg-ink/80 text-white text-[9px] px-1.5 py-0.5 rounded font-bold">Top</span>
+            </div>
+
+            <!-- Bottom Piece -->
+            <div id="canvas-bottom" class="w-44 h-36 rounded-2xl border border-border bg-canvas overflow-hidden shadow-subtle relative group cursor-pointer transition-transform hover:scale-105">
+              <img src="https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=400&q=80" class="w-full h-full object-cover">
+              <span class="absolute bottom-1 right-1 bg-ink/80 text-white text-[9px] px-1.5 py-0.5 rounded font-bold">Bottom</span>
+            </div>
+
+            <!-- Footwear -->
+            <div id="canvas-shoes" class="w-36 h-24 rounded-2xl border border-border bg-canvas overflow-hidden shadow-subtle relative group cursor-pointer transition-transform hover:scale-105">
+              <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=400&q=80" class="w-full h-full object-cover">
+              <span class="absolute bottom-1 right-1 bg-ink/80 text-white text-[9px] px-1.5 py-0.5 rounded font-bold">Shoes</span>
+            </div>
+          </div>
+
+          <div class="w-full pt-3 border-t border-border flex items-center justify-between">
+            <span class="text-xs text-subtle">3 pieces combined</span>
+            <button onclick="saveBuilderOutfit()" class="py-2 px-4 rounded-xl bg-ink hover:bg-black text-white text-xs font-bold transition-all">
+              Save This Outfit
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Live Diagnostic Scores -->
+        <div class="lg:col-span-3 space-y-4">
+          <div class="bg-surface rounded-3xl p-6 border border-border shadow-subtle space-y-4">
+            <h3 class="font-serif text-base font-bold text-ink">Outfit Diagnostics</h3>
+            
+            <div class="space-y-1.5">
+              <div class="flex justify-between text-xs">
+                <span class="text-muted">Color Palette Contrast</span>
+                <span class="font-bold text-ink">95%</span>
+              </div>
+              <div class="w-full bg-sand h-1.5 rounded-full overflow-hidden">
+                <div class="bg-terracotta h-full rounded-full" style="width: 95%"></div>
+              </div>
+            </div>
+
+            <div class="space-y-1.5">
+              <div class="flex justify-between text-xs">
+                <span class="text-muted">Occasion Versatility</span>
+                <span class="font-bold text-ink">9.2 / 10</span>
+              </div>
+              <div class="w-full bg-sand h-1.5 rounded-full overflow-hidden">
+                <div class="bg-emerald-600 h-full rounded-full" style="width: 92%"></div>
+              </div>
+            </div>
+
+            <div class="space-y-1.5">
+              <div class="flex justify-between text-xs">
+                <span class="text-muted">Seasonal Appropriateness</span>
+                <span class="font-bold text-ink">All-Season</span>
+              </div>
+              <div class="w-full bg-sand h-1.5 rounded-full overflow-hidden">
+                <div class="bg-ink h-full rounded-full" style="width: 88%"></div>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-border">
+              <p class="text-[11px] text-muted leading-relaxed">
+                Light tones on the upper torso paired with darker earth-tone trousers naturally lengthens vertical visual proportions.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- --------------------------------------------------------------------- -->
+    <!-- TAB 6: WEEKLY OUTFIT PLANNER                                          -->
+    <!-- --------------------------------------------------------------------- -->
+    <div id="tab-planner" class="tab-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+      
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-widest text-terracotta">
+            Calendar Synchronization
+          </span>
+          <h1 class="font-serif text-3xl font-bold text-ink mt-1">
+            Weekly Outfit Schedule
+          </h1>
+          <p class="text-xs sm:text-sm text-muted mt-1">
+            Plan and pre-schedule your looks to eliminate morning dressing friction.
+          </p>
+        </div>
+        <button onclick="scheduleQuickLook()" class="py-2.5 px-4 rounded-xl bg-ink text-white text-xs font-bold uppercase tracking-wider flex items-center gap-2 self-start sm:self-auto">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          <span>Schedule New Look</span>
+        </button>
+      </div>
+
+      <!-- 7-Day Calendar Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-4" id="planner-calendar-grid">
+        <!-- Rendered via JS -->
+      </div>
+
+    </div>
+
+    <!-- --------------------------------------------------------------------- -->
+    <!-- TAB 7: BRAND PHILOSOPHY & ABOUT                                       -->
+    <!-- --------------------------------------------------------------------- -->
+    <div id="tab-about" class="tab-content max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-14 space-y-16">
+      
+      <div class="text-center space-y-4">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cream border border-border text-xs font-semibold text-terracotta">
+          <i data-lucide="sparkle" class="w-3.5 h-3.5"></i>
+          <span>Our Startup Mission</span>
+        </div>
+        <h1 class="font-serif text-4xl sm:text-5xl font-bold text-ink">
+          The StyleSync Philosophy
+        </h1>
+        <p class="text-base sm:text-lg text-muted max-w-2xl mx-auto leading-relaxed">
+          "Your Wardrobe. Your Style. Smarter Choices."
+        </p>
+      </div>
+
+      <div class="bg-surface rounded-3xl p-8 sm:p-12 border border-border shadow-subtle space-y-6">
+        <h2 class="font-serif text-2xl font-bold text-ink">
+          Rethinking How Modern Wardrobes Function
+        </h2>
+        <p class="text-xs sm:text-sm text-muted leading-relaxed">
+          Fast-fashion business models incentivize excessive consumption: buying micro-trend pieces worn once and pushed to the back of closets. The result is visual chaos, wasted money, and morning decision fatigue.
+        </p>
+        <p class="text-xs sm:text-sm text-muted leading-relaxed">
+          StyleSync approaches styling as a smart optimization discipline. By categorizing personal garments digitally and using color-harmony algorithms, we prove that an intentional 15-piece capsule collection outperforms an uncoordinated 100-piece closet.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div class="p-6 rounded-3xl bg-surface border border-border shadow-subtle space-y-3">
+          <div class="w-10 h-10 rounded-xl bg-cream flex items-center justify-center text-terracotta">
+            <i data-lucide="layers" class="w-5 h-5"></i>
+          </div>
+          <h3 class="font-serif text-lg font-bold text-ink">Capsule Optimization</h3>
+          <p class="text-xs text-muted leading-relaxed">
+            Prioritizing versatile, mix-and-match silhouettes to maximize wear frequency for every garment you own.
+          </p>
+        </div>
+
+        <div class="p-6 rounded-3xl bg-surface border border-border shadow-subtle space-y-3">
+          <div class="w-10 h-10 rounded-xl bg-cream flex items-center justify-center text-terracotta">
+            <i data-lucide="cpu" class="w-5 h-5"></i>
+          </div>
+          <h3 class="font-serif text-lg font-bold text-ink">Algorithmic Balance</h3>
+          <p class="text-xs text-muted leading-relaxed">
+            Eliminating guesswork with mathematically grounded color palettes, occasion suitability scores, and proportional layering.
+          </p>
+        </div>
+
+        <div class="p-6 rounded-3xl bg-surface border border-border shadow-subtle space-y-3">
+          <div class="w-10 h-10 rounded-xl bg-cream flex items-center justify-center text-terracotta">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
+          </div>
+          <h3 class="font-serif text-lg font-bold text-ink">Conscious Spending</h3>
+          <p class="text-xs text-muted leading-relaxed">
+            Helping users only invest in new pieces that fill genuine gaps in their existing wardrobe ecosystem.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- 4. SLIDE-OVER SHOPPING BAG & WISHLIST                                     -->
+  <!-- ========================================================================= -->
+  <!-- Slide-Over Drawer Container -->
+  <div id="cart-drawer-backdrop" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm hidden transition-opacity" onclick="toggleCartDrawer(false)"></div>
+  
+  <div id="cart-drawer" class="fixed top-0 right-0 bottom-0 z-50 w-full max-w-md bg-surface shadow-floating border-l border-border transform translate-x-full transition-transform duration-300 flex flex-col">
+    <!-- Drawer Header -->
+    <div class="p-6 border-b border-border flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <i data-lucide="shopping-bag" class="w-5 h-5 text-terracotta"></i>
+        <h3 class="font-serif text-lg font-bold text-ink">Your Shopping Bag</h3>
+      </div>
+      <button onclick="toggleCartDrawer(false)" class="p-2 rounded-xl text-subtle hover:bg-canvas">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <!-- Items List -->
+    <div class="flex-1 overflow-y-auto p-6 space-y-4" id="cart-items-container">
+      <!-- Injected via JS -->
+    </div>
+
+    <!-- Drawer Footer -->
+    <div class="p-6 border-t border-border bg-canvas space-y-4">
+      <div class="space-y-1.5 text-xs">
+        <div class="flex justify-between text-muted">
+          <span>Subtotal</span>
+          <span id="cart-subtotal" class="font-bold text-ink">₹3,798</span>
+        </div>
+        <div class="flex justify-between text-muted">
+          <span>Estimated Shipping</span>
+          <span class="text-emerald-700 font-bold">Complimentary</span>
+        </div>
+        <div class="flex justify-between text-sm font-bold text-ink pt-2 border-t border-border">
+          <span>Total Look Investment</span>
+          <span id="cart-total" class="font-serif text-base text-terracotta">₹3,798</span>
+        </div>
+      </div>
+
+      <button onclick="openCheckoutModal()" class="w-full py-4 rounded-2xl bg-ink hover:bg-black text-white text-xs font-bold uppercase tracking-wider transition-all shadow-elevated flex items-center justify-center gap-2">
+        <span>Proceed to Secure Checkout</span>
+        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 5. INTERACTIVE MODALS                                                      -->
+  <!-- ========================================================================= -->
+  <!-- Product / Look Detail Modal -->
+  <div id="product-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-surface rounded-3xl max-w-2xl w-full p-6 sm:p-8 border border-border shadow-floating relative max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+      <button onclick="closeProductModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-canvas hover:bg-cream flex items-center justify-center text-ink transition-colors">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      <div id="product-modal-content">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Privacy Policy / Terms Modal -->
+  <div id="legal-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-surface rounded-3xl max-w-xl w-full p-6 sm:p-8 border border-border shadow-floating relative max-h-[85vh] overflow-y-auto" onclick="event.stopPropagation()">
+      <button onclick="closeLegalModal()" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-canvas hover:bg-cream flex items-center justify-center text-ink transition-colors">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      <div id="legal-modal-content" class="space-y-4">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Simple Toast Notification -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 bg-ink text-white px-5 py-3 rounded-2xl shadow-floating text-xs font-semibold flex items-center gap-2.5 transform translate-y-20 opacity-0 transition-all duration-300">
+    <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
+    <span id="toast-text">Notification</span>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 6. CLEAN STARTUP FOOTER (Zero College/Evaluator/Academic References)     -->
+  <!-- ========================================================================= -->
+  <footer class="bg-ink-soft text-[#E5DFD7] border-t border-[#332F2A] mt-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
+        
+        <!-- Brand Column -->
+        <div class="lg:col-span-2 space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-white text-ink flex items-center justify-center font-serif text-lg font-bold">
+              S
+            </div>
+            <span class="font-serif text-2xl font-bold tracking-tight text-white">
+              StyleSync
+            </span>
+          </div>
+          <p class="text-xs text-[#A89F93] leading-relaxed max-w-sm">
+            Intelligent digital wardrobe management and algorithmic personal styling. Engineered to help you dress with confidence while maximizing closet versatility.
+          </p>
+          <div class="pt-1 text-xs text-[#D8A47F] font-semibold flex items-center gap-1.5">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-terracotta"></i>
+            <span>Your Wardrobe. Your Style. Smarter Choices.</span>
+          </div>
+        </div>
+
+        <!-- Product Features -->
+        <div class="space-y-3">
+          <h4 class="font-serif text-sm font-semibold text-white tracking-wide uppercase text-[11px]">
+            Platform Features
+          </h4>
+          <ul class="space-y-2 text-xs text-[#B5ABA0]">
+            <li><a href="javascript:void(0)" onclick="switchTab('stylist')" class="hover:text-white transition-colors">AI Styling Studio</a></li>
+            <li><a href="javascript:void(0)" onclick="switchTab('wardrobe')" class="hover:text-white transition-colors">Digital Closet</a></li>
+            <li><a href="javascript:void(0)" onclick="switchTab('builder')" class="hover:text-white transition-colors">Outfit Canvas</a></li>
+            <li><a href="javascript:void(0)" onclick="switchTab('planner')" class="hover:text-white transition-colors">Weekly Planner</a></li>
+            <li><a href="javascript:void(0)" onclick="switchTab('shop')" class="hover:text-white transition-colors">Curated Drops</a></li>
+          </ul>
+        </div>
+
+        <!-- Collections & Styles -->
+        <div class="space-y-3">
+          <h4 class="font-serif text-sm font-semibold text-white tracking-wide uppercase text-[11px]">
+            Curated Aesthetics
+          </h4>
+          <ul class="space-y-2 text-xs text-[#B5ABA0]">
+            <li><a href="javascript:void(0)" onclick="switchTab('home')" class="hover:text-white transition-colors">Quiet Luxury</a></li>
+            <li><a href="javascript:void(0)" onclick="switchTab('home')" class="hover:text-white transition-colors">Contemporary Street</a></li>
+            <li><a href="javascript:void(0)" onclick="switchTab('home')" class="hover:text-white transition-colors">Smart Casual Work</a></li>
+            <li><a href="javascript:void(0)" onclick="switchTab('home')" class="hover:text-white transition-colors">Weekend Social</a></li>
+            <li><a href="javascript:void(0)" onclick="switchTab('home')" class="hover:text-white transition-colors">Resort & Travel</a></li>
+          </ul>
+        </div>
+
+        <!-- Support & Legal (Clean Startup) -->
+        <div class="space-y-3">
+          <h4 class="font-serif text-sm font-semibold text-white tracking-wide uppercase text-[11px]">
+            Company & Trust
+          </h4>
+          <ul class="space-y-2 text-xs text-[#B5ABA0]">
+            <li><a href="javascript:void(0)" onclick="switchTab('about')" class="hover:text-white transition-colors">Our Philosophy</a></li>
+            <li><a href="javascript:void(0)" onclick="openLegalModal('privacy')" class="hover:text-white transition-colors">Privacy Policy</a></li>
+            <li><a href="javascript:void(0)" onclick="openLegalModal('terms')" class="hover:text-white transition-colors">Terms of Service</a></li>
+            <li><a href="javascript:void(0)" onclick="openLegalModal('contact')" class="hover:text-white transition-colors">Concierge Support</a></li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Lower Copyright Bar -->
+    <div class="border-t border-[#2D2824] bg-[#141210] py-6 px-4 text-center text-xs text-[#82786D]">
+      <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p>
+          © 2026 StyleSync Technologies. All rights reserved.
+        </p>
+        <div class="flex items-center gap-4 text-[11px]">
+          <span>Conscious Fashion Technology</span>
+          <span>•</span>
+          <span>Algorithmic Wardrobe Coordination</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================================================= -->
+  <!-- 7. EMBEDDED JAVASCRIPT: DATA & INTERACTIVE LOGIC                         -->
+  <!-- ========================================================================= -->
+  <script>
+    // -------------------------------------------------------------------------
+    // 1. MOCK DATASETS (High Fashion Unsplash Photography)
+    // -------------------------------------------------------------------------
+    const SAMPLE_PRODUCTS = [
+      {
+        id: 'p1',
+        name: 'Oversized Linen Resort Shirt',
+        category: 'Shirts',
+        price: 1499,
+        originalPrice: 2299,
+        image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=800&q=80',
+        rating: 4.8,
+        desc: 'Relaxed cuban collar in warm ivory tone. Pairs seamlessly with tailored trousers or denim.'
+      },
+      {
+        id: 'p2',
+        name: 'Structured Oxford Tailored Shirt',
+        category: 'Shirts',
+        price: 1899,
+        originalPrice: 2499,
+        image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=800&q=80',
+        rating: 4.7,
+        desc: 'Crisp Egyptian cotton tailored Oxford shirt in soft sky blue.'
+      },
+      {
+        id: 'p3',
+        name: 'Pleated Sand Wide-Leg Trousers',
+        category: 'Trousers',
+        price: 2199,
+        originalPrice: 2899,
+        image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=800&q=80',
+        rating: 4.9,
+        desc: 'High-waisted double pleated trouser with elegant drape in warm beige.'
+      },
+      {
+        id: 'p4',
+        name: 'Vintage Wash Straight Denim',
+        category: 'Trousers',
+        price: 2499,
+        originalPrice: 3199,
+        image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=800&q=80',
+        rating: 4.8,
+        desc: 'Classic 14oz ring-spun denim in medium stone wash with clean hems.'
+      },
+      {
+        id: 'p5',
+        name: 'Double-Breasted Linen Blazer',
+        category: 'Outerwear',
+        price: 3899,
+        originalPrice: 4999,
+        image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80',
+        rating: 4.9,
+        desc: 'Unstructured tailoring in pure sand linen with genuine horn buttons.'
+      },
+      {
+        id: 'p6',
+        name: 'Minimalist Italian Leather Sneaker',
+        category: 'Footwear',
+        price: 2299,
+        originalPrice: 3299,
+        image: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=800&q=80',
+        rating: 4.9,
+        desc: 'Monochrome white calfskin leather with cushioned cupsole.'
+      },
+      {
+        id: 'p7',
+        name: 'Handcrafted Suede Chelsea Boots',
+        category: 'Footwear',
+        price: 3499,
+        originalPrice: 4499,
+        image: 'https://images.unsplash.com/photo-1533867617858-e7b97e060509?auto=format&fit=crop&w=800&q=80',
+        rating: 4.8,
+        desc: 'Rich tobacco suede with elastic gusset and lightweight crepe sole.'
+      },
+      {
+        id: 'p8',
+        name: 'Cognac Full-Grain Leather Tote',
+        category: 'Accessories',
+        price: 1999,
+        originalPrice: 2799,
+        image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80',
+        rating: 4.9,
+        desc: 'Spacious unstructured leather tote fitting 15-inch laptops and notebooks.'
+      },
+      {
+        id: 'p9',
+        name: 'Wool Blend Minimal Overcoat',
+        category: 'Outerwear',
+        price: 4999,
+        originalPrice: 6499,
+        image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=800&q=80',
+        rating: 4.9,
+        desc: 'Substantial charcoal wool coat with notched lapels and satin lining.'
+      },
+      {
+        id: 'p10',
+        name: 'Heavyweight Ribbed Cotton Tee',
+        category: 'Shirts',
+        price: 999,
+        originalPrice: 1499,
+        image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80',
+        rating: 4.7,
+        desc: '260 GSM combed cotton with dense collar ribbing in warm sand.'
+      },
+      {
+        id: 'p11',
+        name: 'Tortoiseshell Acetate Sunglasses',
+        category: 'Accessories',
+        price: 1199,
+        originalPrice: 1799,
+        image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=800&q=80',
+        rating: 4.6,
+        desc: 'Square timeless silhouette with UV400 polarized bronze lenses.'
+      },
+      {
+        id: 'p12',
+        name: 'Classic Canvas Low-Top Runners',
+        category: 'Footwear',
+        price: 1699,
+        originalPrice: 2299,
+        image: 'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?auto=format&fit=crop&w=800&q=80',
+        rating: 4.8,
+        desc: 'Off-white organic canvas sneaker with reinforced vulcanized rubber sole.'
+      }
+    ];
+
+    const SAMPLE_WARDROBE = [
+      { id: 'w1', name: 'Crisp White Poplin Shirt', slot: 'top', cost: '₹1,200', wears: 24, costPerWear: '₹50', image: 'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?auto=format&fit=crop&w=800&q=80' },
+      { id: 'w2', name: 'Mid-Rise Straight Denim', slot: 'bottom', cost: '₹2,400', wears: 42, costPerWear: '₹57', image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=800&q=80' },
+      { id: 'w3', name: 'Sand Tailored Blazer', slot: 'outerwear', cost: '₹3,800', wears: 18, costPerWear: '₹211', image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80' },
+      { id: 'w4', name: 'Clean White Leather Sneaker', slot: 'footwear', cost: '₹2,600', wears: 65, costPerWear: '₹40', image: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=800&q=80' },
+      { id: 'w5', name: 'Cognac Leather Work Tote', slot: 'accessory', cost: '₹2,000', wears: 80, costPerWear: '₹25', image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80' },
+      { id: 'w6', name: 'Ribbed Mocha Mockneck', slot: 'top', cost: '₹1,400', wears: 12, costPerWear: '₹116', image: 'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=800&q=80' },
+      { id: 'w7', name: 'Tobacco Suede Chelsea Boot', slot: 'footwear', cost: '₹3,500', wears: 28, costPerWear: '₹125', image: 'https://images.unsplash.com/photo-1533867617858-e7b97e060509?auto=format&fit=crop&w=800&q=80' },
+      { id: 'w8', name: 'Pleated Charcoal Trousers', slot: 'bottom', cost: '₹2,100', wears: 31, costPerWear: '₹67', image: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=800&q=80' }
+    ];
+
+    let cart = [
+      { product: SAMPLE_PRODUCTS[0], size: 'M', qty: 1 },
+      { product: SAMPLE_PRODUCTS[5], size: 'UK 8', qty: 1 }
+    ];
+
+    let wishlist = ['p1', 'p3', 'p5'];
+
+    // -------------------------------------------------------------------------
+    // 2. TAB SWITCHING LOGIC
+    // -------------------------------------------------------------------------
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      const target = document.getElementById('tab-' + tabId);
+      if (target) {
+        target.classList.add('active');
+      }
+
+      // Update nav button active states
+      document.querySelectorAll('.nav-link').forEach(btn => {
+        btn.classList.remove('bg-white', 'text-ink', 'shadow-sm', 'border', 'border-border', 'font-semibold');
+        btn.classList.add('text-muted');
+      });
+      const activeBtn = document.getElementById('nav-btn-' + tabId);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-white', 'text-ink', 'shadow-sm', 'border', 'border-border', 'font-semibold');
+        activeBtn.classList.remove('text-muted');
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function toggleMobileMenu(force) {
+      const drawer = document.getElementById('mobile-drawer');
+      if (force !== undefined) {
+        drawer.classList.toggle('hidden', !force);
+      } else {
+        drawer.classList.toggle('hidden');
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // 3. TOAST NOTIFICATION
+    // -------------------------------------------------------------------------
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const text = document.getElementById('toast-text');
+      text.innerText = message;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+
+    // -------------------------------------------------------------------------
+    // 4. SHOP & CATALOGUE LOGIC
+    // -------------------------------------------------------------------------
+    function renderShop(productsToRender) {
+      const container = document.getElementById('products-grid');
+      container.innerHTML = productsToRender.map(prod => `
+        <div class="group bg-surface rounded-3xl overflow-hidden border border-border shadow-subtle hover:shadow-elevated transition-all flex flex-col">
+          <div class="img-zoom relative aspect-square bg-cream cursor-pointer" onclick="openProductModal('${prod.id}')">
+            <img src="${prod.image}" alt="${prod.name}" class="w-full h-full object-cover">
+            <button onclick="event.stopPropagation(); toggleWishlist('${prod.id}', this)" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-surface/90 backdrop-blur-md flex items-center justify-center text-ink hover:text-terracotta transition-colors shadow-subtle">
+              <i data-lucide="heart" class="w-4 h-4 ${wishlist.includes(prod.id) ? 'fill-terracotta text-terracotta' : ''}"></i>
+            </button>
+            <div class="absolute bottom-2 left-2 bg-ink/75 text-white text-[9px] font-bold px-2 py-0.5 rounded backdrop-blur-sm">
+              ★ ${prod.rating}
+            </div>
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
+            <div>
+              <span class="text-[10px] text-subtle uppercase tracking-wider block font-semibold">${prod.category}</span>
+              <h4 class="font-serif text-sm font-bold text-ink truncate cursor-pointer hover:text-terracotta" onclick="openProductModal('${prod.id}')">${prod.name}</h4>
+              <p class="text-[11px] text-muted line-clamp-1 mt-0.5">${prod.desc}</p>
+            </div>
+            <div class="pt-2 border-t border-border-subtle flex items-center justify-between">
+              <div>
+                <span class="font-serif text-sm font-bold text-ink">₹${prod.price.toLocaleString('en-IN')}</span>
+                <span class="text-[10px] text-subtle line-through ml-1">₹${prod.originalPrice.toLocaleString('en-IN')}</span>
+              </div>
+              <button onclick="addToCart('${prod.id}')" class="p-2 rounded-xl bg-canvas hover:bg-ink hover:text-white border border-border text-ink transition-colors" title="Add to Bag">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function filterShopCategory(btn, category) {
+      document.querySelectorAll('.shop-filter').forEach(b => {
+        b.classList.remove('bg-ink', 'text-white');
+        b.classList.add('bg-surface', 'border', 'border-border', 'text-muted');
+      });
+      btn.classList.add('bg-ink', 'text-white');
+      btn.classList.remove('bg-surface', 'border', 'border-border', 'text-muted');
+
+      if (category === 'all') {
+        renderShop(SAMPLE_PRODUCTS);
+      } else {
+        const filtered = SAMPLE_PRODUCTS.filter(p => p.category === category);
+        renderShop(filtered);
+      }
+    }
+
+    function filterShopProducts() {
+      const q = document.getElementById('shop-search').value.toLowerCase().trim();
+      const filtered = SAMPLE_PRODUCTS.filter(p => 
+        p.name.toLowerCase().includes(q) || 
+        p.category.toLowerCase().includes(q) ||
+        p.desc.toLowerCase().includes(q)
+      );
+      renderShop(filtered);
+    }
+
+    function sortShopProducts() {
+      const mode = document.getElementById('shop-sort').value;
+      let sorted = [...SAMPLE_PRODUCTS];
+      if (mode === 'price-low') sorted.sort((a,b) => a.price - b.price);
+      if (mode === 'price-high') sorted.sort((a,b) => b.price - a.price);
+      if (mode === 'rating') sorted.sort((a,b) => b.rating - a.rating);
+      renderShop(sorted);
+    }
+
+    // -------------------------------------------------------------------------
+    // 5. WARDROBE RENDERING
+    // -------------------------------------------------------------------------
+    function renderWardrobe(items) {
+      const container = document.getElementById('wardrobe-grid');
+      container.innerHTML = items.map(item => `
+        <div class="group bg-surface rounded-3xl overflow-hidden border border-border shadow-subtle p-3 flex flex-col space-y-3">
+          <div class="img-zoom aspect-square rounded-2xl overflow-hidden bg-cream relative">
+            <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover">
+            <span class="absolute top-2 left-2 bg-ink/80 text-white text-[9px] uppercase font-bold px-2 py-0.5 rounded backdrop-blur-sm">
+              ${item.slot}
+            </span>
+          </div>
+          <div class="flex-1 flex flex-col justify-between">
+            <div>
+              <h4 class="font-serif text-xs font-bold text-ink truncate">${item.name}</h4>
+              <p class="text-[10px] text-subtle mt-0.5">Worn ${item.wears} times • ${item.costPerWear}/wear</p>
+            </div>
+            <button onclick="sendToCanvas('${item.id}')" class="mt-2 w-full py-1.5 rounded-xl bg-canvas hover:bg-cream border border-border text-[11px] font-bold text-ink transition-colors flex items-center justify-center gap-1">
+              <i data-lucide="palette" class="w-3 h-3 text-terracotta"></i>
+              <span>Send to Canvas</span>
+            </button>
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function filterWardrobeCategory(btn, slot) {
+      document.querySelectorAll('.wardrobe-tab').forEach(b => {
+        b.classList.remove('bg-ink', 'text-white');
+        b.classList.add('bg-surface', 'border', 'border-border', 'text-muted');
+      });
+      btn.classList.add('bg-ink', 'text-white');
+      btn.classList.remove('bg-surface', 'border', 'border-border', 'text-muted');
+
+      if (slot === 'all') {
+        renderWardrobe(SAMPLE_WARDROBE);
+      } else {
+        renderWardrobe(SAMPLE_WARDROBE.filter(w => w.slot === slot));
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // 6. OUTFIT BUILDER (CANVAS STUDIO)
+    // -------------------------------------------------------------------------
+    function renderBuilderPalette() {
+      const container = document.getElementById('builder-palette-list');
+      container.innerHTML = SAMPLE_WARDROBE.map(item => `
+        <div onclick="swapCanvasPiece('${item.slot}', '${item.image}')" class="flex items-center gap-3 p-2.5 rounded-2xl bg-canvas hover:bg-cream border border-border cursor-pointer transition-colors group">
+          <div class="w-12 h-12 rounded-xl overflow-hidden bg-white shrink-0">
+            <img src="${item.image}" class="w-full h-full object-cover">
+          </div>
+          <div class="flex-1 min-w-0">
+            <span class="text-[9px] uppercase font-bold text-subtle block">${item.slot}</span>
+            <p class="text-xs font-bold text-ink truncate group-hover:text-terracotta">${item.name}</p>
+          </div>
+          <i data-lucide="plus" class="w-4 h-4 text-subtle group-hover:text-ink"></i>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function swapCanvasPiece(slot, imgUrl) {
+      if (slot === 'top') {
+        document.querySelector('#canvas-top img').src = imgUrl;
+        showToast('Updated Canvas Top');
+      } else if (slot === 'bottom') {
+        document.querySelector('#canvas-bottom img').src = imgUrl;
+        showToast('Updated Canvas Bottom');
+      } else if (slot === 'footwear') {
+        document.querySelector('#canvas-shoes img').src = imgUrl;
+        showToast('Updated Canvas Shoes');
+      } else {
+        showToast('Piece assigned to Canvas');
+      }
+    }
+
+    function saveBuilderOutfit() {
+      showToast('Look saved to your Custom Outfits Collection!');
+    }
+
+    // -------------------------------------------------------------------------
+    // 7. WEEKLY PLANNER LOGIC
+    // -------------------------------------------------------------------------
+    const WEEK_DAYS = [
+      { day: 'Mon', date: '27 Oct', title: 'Strategy & Client Review', weather: '24°C ☀️', img: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=400&q=80' },
+      { day: 'Tue', date: '28 Oct', title: 'Studio Creative Session', weather: '21°C ⛅', img: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=400&q=80' },
+      { day: 'Wed', date: '29 Oct', title: 'Work From Cafe & Meetup', weather: '23°C ☀️', img: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=400&q=80' },
+      { day: 'Thu', date: '30 Oct', title: 'Product Architecture Review', weather: '19°C 🍂', img: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=400&q=80' },
+      { day: 'Fri', date: '31 Oct', title: 'Rooftop Cocktail Social', weather: '18°C 🌙', img: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=400&q=80' },
+      { day: 'Sat', date: '1 Nov', title: 'Weekend Farmer Market', weather: '25°C ☀️', img: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=400&q=80' },
+      { day: 'Sun', date: '2 Nov', title: 'Slow Brunch & Reading', weather: '26°C ☀️', img: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=400&q=80' }
+    ];
+
+    function renderPlanner() {
+      const container = document.getElementById('planner-calendar-grid');
+      container.innerHTML = WEEK_DAYS.map((d, index) => `
+        <div class="bg-surface rounded-2xl p-4 border border-border shadow-subtle flex flex-col justify-between space-y-3 group hover:border-terracotta transition-colors">
+          <div>
+            <div class="flex items-center justify-between pb-2 border-b border-border-subtle">
+              <span class="font-serif font-bold text-sm text-ink">${d.day}</span>
+              <span class="text-[10px] text-subtle">${d.date}</span>
+            </div>
+            <div class="flex items-center justify-between text-[10px] text-muted pt-1">
+              <span>${d.weather}</span>
+            </div>
+            <p class="text-xs font-bold text-ink mt-2 line-clamp-1">${d.title}</p>
+          </div>
+
+          <div class="img-zoom aspect-[3/4] rounded-xl overflow-hidden bg-cream relative">
+            <img src="${d.img}" class="w-full h-full object-cover">
+          </div>
+
+          <button onclick="showToast('Reassigned outfit for ${d.day}!')" class="w-full py-1.5 rounded-lg bg-canvas hover:bg-cream border border-border text-[10px] font-bold text-ink transition-colors">
+            Change Look
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function scheduleQuickLook() {
+      showToast('Opened Schedule Assistant: Look assigned for tomorrow!');
+    }
+
+    // -------------------------------------------------------------------------
+    // 8. CART & WISHLIST LOGIC
+    // -------------------------------------------------------------------------
+    function toggleCartDrawer(open) {
+      const drawer = document.getElementById('cart-drawer');
+      const backdrop = document.getElementById('cart-drawer-backdrop');
+      if (open) {
+        renderCart();
+        backdrop.classList.remove('hidden');
+        setTimeout(() => drawer.classList.remove('translate-x-full'), 10);
+      } else {
+        drawer.classList.add('translate-x-full');
+        setTimeout(() => backdrop.classList.add('hidden'), 300);
+      }
+    }
+
+    function renderCart() {
+      const container = document.getElementById('cart-items-container');
+      const badge = document.getElementById('cart-badge');
+      const subtotalEl = document.getElementById('cart-subtotal');
+      const totalEl = document.getElementById('cart-total');
+
+      badge.innerText = cart.length;
+
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="py-16 text-center space-y-3">
+            <i data-lucide="shopping-bag" class="w-10 h-10 text-subtle mx-auto"></i>
+            <p class="text-xs text-muted">Your shopping bag is currently empty.</p>
+            <button onclick="toggleCartDrawer(false); switchTab('shop');" class="px-4 py-2 rounded-xl bg-ink text-white text-xs font-bold">
+              Explore Drops
+            </button>
+          </div>
+        `;
+        subtotalEl.innerText = '₹0';
+        totalEl.innerText = '₹0';
+        lucide.createIcons();
+        return;
+      }
+
+      let subtotal = 0;
+      container.innerHTML = cart.map((item, idx) => {
+        subtotal += item.product.price * item.qty;
+        return `
+          <div class="flex items-center gap-3 p-3 rounded-2xl bg-canvas border border-border">
+            <div class="w-16 h-16 rounded-xl overflow-hidden bg-white shrink-0">
+              <img src="${item.product.image}" class="w-full h-full object-cover">
+            </div>
+            <div class="flex-1 min-w-0">
+              <h4 class="text-xs font-bold text-ink truncate">${item.product.name}</h4>
+              <p class="text-[10px] text-subtle">Size: ${item.size} • Qty: ${item.qty}</p>
+              <p class="text-xs font-bold text-terracotta mt-0.5">₹${(item.product.price * item.qty).toLocaleString('en-IN')}</p>
+            </div>
+            <button onclick="removeFromCart(${idx})" class="p-1.5 text-subtle hover:text-rose-600 transition-colors">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      subtotalEl.innerText = '₹' + subtotal.toLocaleString('en-IN');
+      totalEl.innerText = '₹' + subtotal.toLocaleString('en-IN');
+      lucide.createIcons();
+    }
+
+    function addToCart(productId) {
+      const prod = SAMPLE_PRODUCTS.find(p => p.id === productId);
+      if (prod) {
+        cart.push({ product: prod, size: 'M', qty: 1 });
+        renderCart();
+        showToast(`Added ${prod.name} to your bag!`);
+      }
+    }
+
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      renderCart();
+      showToast('Removed item from bag.');
+    }
+
+    function toggleWishlist(productId, btn) {
+      if (wishlist.includes(productId)) {
+        wishlist = wishlist.filter(id => id !== productId);
+        showToast('Removed from Wishlist');
+      } else {
+        wishlist.push(productId);
+        showToast('Saved to Wishlist!');
+      }
+      document.getElementById('wishlist-badge').innerText = wishlist.length;
+      if (btn) {
+        const icon = btn.querySelector('svg');
+        if (icon) {
+          icon.classList.toggle('fill-terracotta');
+          icon.classList.toggle('text-terracotta');
+        }
+      }
+    }
+
+    function openWishlist() {
+      showToast(`${wishlist.length} curated looks saved in your wishlist.`);
+    }
+
+    // -------------------------------------------------------------------------
+    // 9. STYLIST GENERATOR LOGIC
+    // -------------------------------------------------------------------------
+    let currentStylistState = {
+      occasion: 'Smart Casual Office',
+      aesthetic: 'Minimalist Quiet Luxury',
+      weather: 'Mild & Sunny'
+    };
+
+    function setStylistParam(type, value, btn) {
+      currentStylistState[type] = value;
+      const parent = btn.parentElement;
+      parent.querySelectorAll('button').forEach(b => {
+        b.classList.remove('bg-ink', 'text-white', 'font-bold');
+        b.classList.add('bg-canvas', 'text-ink');
+      });
+      btn.classList.add('bg-ink', 'text-white', 'font-bold');
+      btn.classList.remove('bg-canvas', 'text-ink');
+    }
+
+    function runStylistAlgorithm() {
+      const btn = document.getElementById('generate-outfit-btn');
+      const origText = btn.innerHTML;
+      btn.innerHTML = `<span class="animate-spin inline-block mr-2">⚙️</span> Matching Silhouettes...`;
+      btn.disabled = true;
+
+      setTimeout(() => {
+        btn.innerHTML = origText;
+        btn.disabled = false;
+
+        document.getElementById('result-occasion-tag').innerText = currentStylistState.occasion;
+        document.getElementById('result-vibe-tag').innerText = currentStylistState.aesthetic;
+        document.getElementById('result-outfit-name').innerText = `${currentStylistState.aesthetic.split(' ')[0]} ${currentStylistState.occasion} Coordination`;
+
+        showToast('Generated fresh outfit look tailored to your inputs!');
+      }, 700);
+    }
+
+    function saveCuratedOutfit() {
+      showToast('Curated look saved to your Outfits Collection!');
+    }
+
+    function addOutfitToBag() {
+      addToCart('p6');
+      toggleCartDrawer(true);
+    }
+
+    // -------------------------------------------------------------------------
+    // 10. MODALS (PRODUCT & LEGAL)
+    // -------------------------------------------------------------------------
+    function openProductModal(prodId) {
+      const prod = SAMPLE_PRODUCTS.find(p => p.id === prodId);
+      if (!prod) return;
+      const modal = document.getElementById('product-modal');
+      const content = document.getElementById('product-modal-content');
+
+      content.innerHTML = `
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 items-center">
+          <div class="aspect-square rounded-2xl overflow-hidden bg-cream">
+            <img src="${prod.image}" class="w-full h-full object-cover">
+          </div>
+          <div class="space-y-4">
+            <div>
+              <span class="text-xs uppercase tracking-wider text-terracotta font-bold">${prod.category}</span>
+              <h3 class="font-serif text-2xl font-bold text-ink mt-0.5">${prod.name}</h3>
+              <p class="font-serif text-xl font-bold text-ink mt-1">₹${prod.price.toLocaleString('en-IN')}</p>
+            </div>
+            <p class="text-xs text-muted leading-relaxed">${prod.desc}</p>
+            <div class="space-y-1.5">
+              <span class="text-xs font-bold text-ink block">Select Size</span>
+              <div class="flex gap-2">
+                <button class="w-9 h-9 rounded-xl border border-border text-xs font-bold bg-canvas hover:bg-ink hover:text-white transition-colors">S</button>
+                <button class="w-9 h-9 rounded-xl border border-ink text-xs font-bold bg-ink text-white">M</button>
+                <button class="w-9 h-9 rounded-xl border border-border text-xs font-bold bg-canvas hover:bg-ink hover:text-white transition-colors">L</button>
+                <button class="w-9 h-9 rounded-xl border border-border text-xs font-bold bg-canvas hover:bg-ink hover:text-white transition-colors">XL</button>
+              </div>
+            </div>
+            <button onclick="addToCart('${prod.id}'); closeProductModal(); toggleCartDrawer(true);" class="w-full py-3.5 rounded-2xl bg-ink hover:bg-black text-white text-xs font-bold uppercase tracking-wider transition-all">
+              Add To Shopping Bag
+            </button>
+          </div>
+        </div>
+      `;
+      modal.classList.remove('hidden');
+    }
+
+    function closeProductModal() {
+      document.getElementById('product-modal').classList.add('hidden');
+    }
+
+    function openLookModal(title, occasion, price, img) {
+      const modal = document.getElementById('product-modal');
+      const content = document.getElementById('product-modal-content');
+      content.innerHTML = `
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 items-center">
+          <div class="aspect-[4/5] rounded-2xl overflow-hidden bg-cream">
+            <img src="${img}" class="w-full h-full object-cover">
+          </div>
+          <div class="space-y-4">
+            <div>
+              <span class="text-xs uppercase tracking-wider text-terracotta font-bold">${occasion}</span>
+              <h3 class="font-serif text-2xl font-bold text-ink mt-0.5">${title}</h3>
+              <p class="font-serif text-lg font-bold text-ink mt-1">${price} <span class="text-xs font-normal text-muted">(Full Look Investment)</span></p>
+            </div>
+            <p class="text-xs text-muted leading-relaxed">
+              Curated as a versatile capsule coordination. Every piece can be styled individually with staple wardrobe items.
+            </p>
+            <div class="p-3 bg-canvas rounded-xl border border-border text-xs space-y-1">
+              <span class="font-bold text-ink block">Stylist Pairing Score: 97%</span>
+              <span class="text-subtle">Occasion fit: High • Versatility rating: 9.4/10</span>
+            </div>
+            <button onclick="closeProductModal(); switchTab('stylist');" class="w-full py-3.5 rounded-2xl bg-ink hover:bg-black text-white text-xs font-bold uppercase tracking-wider transition-all">
+              Load Into AI Styling Studio
+            </button>
+          </div>
+        </div>
+      `;
+      modal.classList.remove('hidden');
+    }
+
+    function openLegalModal(type) {
+      const modal = document.getElementById('legal-modal');
+      const content = document.getElementById('legal-modal-content');
+
+      if (type === 'privacy') {
+        content.innerHTML = `
+          <h3 class="font-serif text-xl font-bold text-ink">Privacy Policy & Data Security</h3>
+          <p class="text-xs text-muted leading-relaxed">
+            At StyleSync, your wardrobe photographs and personal styling choices belong strictly to you.
+          </p>
+          <ul class="text-xs text-muted space-y-2 list-disc pl-5">
+            <li><strong>Zero Commercial Data Selling:</strong> We never sell your personal styling habits, sizing information, or closet inventory to third-party ad networks.</li>
+            <li><strong>Encrypted Storage:</strong> User wardrobe photographs are stored in isolated encrypted cloud buckets with user-level authentication keys.</li>
+            <li><strong>Data Portability:</strong> You can export or permanently delete your digitized wardrobe history at any time.</li>
+          </ul>
+        `;
+      } else if (type === 'terms') {
+        content.innerHTML = `
+          <h3 class="font-serif text-xl font-bold text-ink">Terms of Service</h3>
+          <p class="text-xs text-muted leading-relaxed">
+            Welcome to StyleSync. By accessing our platform, you agree to our styling and platform guidelines:
+          </p>
+          <ul class="text-xs text-muted space-y-2 list-disc pl-5">
+            <li><strong>Personal Non-Commercial Use:</strong> StyleSync algorithmic outfit suggestions are provided for individual wardrobe coordination.</li>
+            <li><strong>Fair Platform Usage:</strong> Automated scraping of curated catalogue items or image libraries is prohibited.</li>
+            <li><strong>Intellectual Property:</strong> StyleSync branding, curation algorithms, and visual interfaces are protected trademarks.</li>
+          </ul>
+        `;
+      } else {
+        content.innerHTML = `
+          <h3 class="font-serif text-xl font-bold text-ink">Concierge Styling & Support</h3>
+          <p class="text-xs text-muted leading-relaxed">
+            Have questions regarding sizing, capsule planning, or order delivery?
+          </p>
+          <div class="p-4 rounded-2xl bg-canvas border border-border text-xs space-y-2">
+            <p><strong>Concierge Hours:</strong> Monday – Saturday, 9:00 AM – 7:00 PM IST</p>
+            <p><strong>Styling Support:</strong> <span class="text-terracotta">concierge@stylesync.fashion</span></p>
+            <p><strong>Response Time:</strong> Within 4 business hours</p>
+          </div>
+        `;
+      }
+      modal.classList.remove('hidden');
+    }
+
+    function closeLegalModal() {
+      document.getElementById('legal-modal').classList.add('hidden');
+    }
+
+    function openCheckoutModal() {
+      toggleCartDrawer(false);
+      showToast('Order confirmed! Tracking details sent to your registered email.');
+      cart = [];
+      renderCart();
+    }
+
+    function filterOccasion(btn, cat) {
+      document.querySelectorAll('.occasion-chip').forEach(b => {
+        b.classList.remove('bg-ink', 'text-white');
+        b.classList.add('bg-surface', 'border', 'border-border', 'text-muted');
+      });
+      btn.classList.add('bg-ink', 'text-white');
+      btn.classList.remove('bg-surface', 'border', 'border-border', 'text-muted');
+
+      document.querySelectorAll('.lookbook-item').forEach(item => {
+        if (cat === 'all' || item.getAttribute('data-cat') === cat) {
+          item.style.display = 'flex';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+
+    function toggleLookLike(btn) {
+      const icon = btn.querySelector('svg');
+      if (icon) {
+        icon.classList.toggle('fill-terracotta');
+        icon.classList.toggle('text-terracotta');
+        showToast('Added look to your Moodboard!');
+      }
+    }
+
+    function openAddGarmentModal() {
+      showToast('Garment Capture: Photo analysis complete! Added to Digital Closet.');
+    }
+
+    function sendToCanvas(itemId) {
+      switchTab('builder');
+      showToast('Garment loaded onto Outfit Canvas!');
+    }
+
+    // -------------------------------------------------------------------------
+    // 11. INITIALIZATION ON DOM LOAD
+    // -------------------------------------------------------------------------
+    document.addEventListener('DOMContentLoaded', () => {
+      renderShop(SAMPLE_PRODUCTS);
+      renderWardrobe(SAMPLE_WARDROBE);
+      renderBuilderPalette();
+      renderPlanner();
+      renderCart();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

@@ -20,7 +20,7 @@ export const StylistPage: React.FC = () => {
   const { products, saveOutfit, addToCart, showToast, navigateTo, userProfile } = useApp();
 
   // Criteria state
-  const [occasion, setOccasion] = useState<OccasionTag>('College');
+  const [occasion, setOccasion] = useState<OccasionTag>('Casual outing');
   const [style, setStyle] = useState<StyleTag>('Smart casual');
   const [budgetMax, setBudgetMax] = useState<number>(6500);
   const [preferredColors, setPreferredColors] = useState<string[]>(['Ivory', 'Terracotta', 'Beige']);
@@ -45,7 +45,7 @@ export const StylistPage: React.FC = () => {
   } | null>(() => {
     // Generate initial look on first render
     const initialCriteria: StylistCriteria = {
-      occasion: 'College',
+      occasion: 'Casual outing',
       style: 'Smart casual',
       budgetMax: 6500,
       preferredColors: ['Ivory', 'Terracotta', 'Beige'],
@@ -516,14 +516,14 @@ export const StylistPage: React.FC = () => {
             </div>
           )}
 
-          {/* Academic Transparency & AI Disclosure Box */}
-          <div className="bg-[#FAF6F0] rounded-2xl p-5 border border-[#E8DFC8] space-y-2 text-xs text-[#5C5245]">
-            <div className="flex items-center gap-2 text-[#8C533E] font-bold">
-              <Info className="w-4 h-4 shrink-0" />
-              <span>Transparent AI Stylist Disclosure (Academic Specification)</span>
+          {/* Styling Architecture Rationale */}
+          <div className="bg-white rounded-2xl p-5 border border-[#EDE8E0] space-y-2 text-xs text-[#5C5245] shadow-sm">
+            <div className="flex items-center gap-2 text-[#1A1A1A] font-bold">
+              <Sparkles className="w-4 h-4 text-[#C86D51] shrink-0" />
+              <span>Algorithmic Styling Architecture</span>
             </div>
-            <p className="leading-relaxed">
-              This initial MVP utilizes a deterministic, client-side rule-based recommendation engine scoring candidates across occasion dress-codes, silhouette tags, color harmony, and budget limits. It is designed so that a multimodal LLM (such as Gemini 2.5 Flash / Vision) can be integrated via our standard API interface without modifying the UI layer.
+            <p className="leading-relaxed text-[11px] text-[#6B5E50]">
+              StyleSync computes optimal outfits using multi-factor constraint satisfaction: matching color temperatures, occasion dress codes, proportional layering, and budget thresholds. Every suggested piece includes transparent reasoning so you understand why it complements your look.
             </p>
           </div>
         </div>
@@ -548,7 +548,7 @@ export const StylistPage: React.FC = () => {
                 value={customOutfitName}
                 onChange={(e) => setCustomOutfitName(e.target.value)}
                 className="w-full px-3.5 py-2.5 rounded-xl border border-[#DDD5CB] text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none"
-                placeholder="e.g. Tuesday Presentation Look"
+                placeholder="e.g. Saturday Social Ensemble"
               />
             </div>
             <div className="flex gap-2 justify-end pt-2">

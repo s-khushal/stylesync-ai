@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { isSupabaseConfigured } from '../../lib/supabase';
 import { 
@@ -6,25 +6,34 @@ import {
   Mail, 
   Lock, 
   User as UserIcon, 
-  ShieldCheck, 
   AlertCircle, 
   CheckCircle2, 
   Loader2, 
   Cloud, 
   Sparkles,
-  ArrowRight
+  ArrowRight,
+  KeyRound,
+  RotateCcw
 } from 'lucide-react';
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  defaultMode?: 'signin' | 'signup';
+  defaultMode?: 'signin' | 'signup' | 'forgot';
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'signin' }) => {
-  const { signInWithEmail, signUpWithEmail, showToast } = useApp();
+  const { 
+    signInWithEmail, 
+    signUpWithEmail, 
+    sendPasswordResetEmail, 
+    resendConfirmationEmail, 
+    showToast,
+    authModalMode,
+    setAuthModalMode
+  } = useApp();
 
-  const [mode, setMode] = useState<'signin' | 'signup'>(defaultMode);
+  const [mode, setMode] = useState<'signin' | 'signup' | 'forgot'>(defaultMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -33,6 +42,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMo
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [canResendConfirmation, setCanResendConfirmation] = useState(false);
+
+  useEffect(() => {
+    if (authModalMode) {
+      setMode(authModalMode);
+    }
+  }, [authModalMode]);
+
+  useEffect(() => {
+    setErrorMessage(null);
+    setSuccessMessage(null);
+    setCanResendConfirmation(false);
+  }, [mode]);
 
   if (!isOpen) return null;
 
@@ -46,7 +68,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMo
       return;
     }
 
-    if (!password || password.length < 6) {
+    if (mode !== 'forgot' && (!password || password.length < 6)) {
       setErrorMessage('Password must be at least 6 characters long.');
       return;
     }
@@ -70,14 +92,23 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMo
             result.message || 'Account created successfully! Check your email to confirm registration or sign in.'
           );
           showToast('Account registered successfully!', 'success');
-          setTimeout(() => {
-            onClose();
-          }, 2000);
+          setCanResendConfirmation(true);
+        }
+      } else if (mode === 'forgot') {
+        const result = await sendPasswordResetEmail(email.trim());
+        if (result.error) {
+          setErrorMessage(result.error);
+        } else {
+          setSuccessMessage(result.message || 'Password reset link sent! Check your email.');
+          showToast('Password reset link sent!', 'success');
         }
       } else {
         const result = await signInWithEmail(email.trim(), password);
         if (result.error) {
           setErrorMessage(result.error);
+          if (result.error.toLowerCase().includes('confirm') || result.error.toLowerCase().includes('verified')) {
+            setCanResendConfirmation(true);
+          }
         } else {
           showToast('Welcome back! Cloud sync active.', 'success');
           onClose();
@@ -87,6 +118,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMo
       setErrorMessage(err.message || 'An unexpected authentication error occurred.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleResendConfirmation = async () => {
+    if (!email.trim()) {
+      setErrorMessage('Please enter your email address first.');
+      return;
+    }
+    setIsLoading(true);
+    const res = await resendConfirmationEmail(email.trim());
+    setIsLoading(false);
+    if (res.error) {
+      setErrorMessage(res.error);
+    } else {
+      setSuccessMessage(res.message || 'Confirmation link resent! Check your inbox.');
+      showToast('Confirmation email resent!', 'success');
     }
   };
 
@@ -104,10 +151,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMo
             </div>
             <div>
               <h3 className="font-serif text-lg font-bold text-[#1A1A1A]">
-                {mode === 'signin' ? 'Sign In to StyleSync' : 'Create Free Account'}
+                {mode === 'signin' && 'Sign In to StyleSync'}
+                {mode === 'signup' && 'Create Free Account'}
+                {mode === 'forgot' && 'Reset Password'}
               </h3>
               <p className="text-[11px] text-[#8C7E6D]">
-                {mode === 'signin' ? 'Access your cloud wardrobe & saved looks' : 'Cloud sync & personalized styling'}
+                {mode === 'signin' && 'Access your private wardrobe & saved looks'}
+                {mode === 'signup' && 'Cloud sync, AI styling & smart wardrobe curation'}
+                {mode === 'forgot' && 'Receive a secure reset link in your inbox'}
               </p>
             </div>
           </div>
@@ -126,8 +177,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMo
             <div className="p-3.5 rounded-2xl bg-[#FFFDF9] border border-[#E8DFC8] flex items-start gap-3 text-xs text-[#6B5E50]">
               <AlertCircle className="w-4 h-4 text-[#C86D51] shrink-0 mt-0.5" />
               <div>
-                <strong className="text-[#1A1A1A] block mb-0.5">Local Demo Mode Active</strong>
-                Supabase credentials have not been configured in <code className="bg-[#FAF6F0] px-1 py-0.5 rounded font-mono text-[10px]">.env</code> yet. You can continue testing all features locally using localStorage. To enable live cloud accounts, add your project URL and publishable key.
+                <strong className="text-[#1A1A1A] block mb-0.5">Configuration Required</strong>
+                Add <code className="bg-[#FAF6F0] px-1 py-0.5 rounded font-mono text-[10px]">VITE_SUPABASE_URL</code> and <code className="bg-[#FAF6F0] px-1 py-0.5 rounded font-mono text-[10px]">VITE_SUPABASE_ANON_KEY</code> to your <code className="bg-[#FAF6F0] px-1 py-0.5 rounded font-mono text-[10px]">.env</code> file.
               </div>
             </div>
           ) : (
@@ -140,14 +191,36 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMo
           {errorMessage && (
             <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 flex items-start gap-2 text-xs">
               <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-              <span>{errorMessage}</span>
+              <div className="flex-1">
+                <span>{errorMessage}</span>
+                {canResendConfirmation && (
+                  <button
+                    type="button"
+                    onClick={handleResendConfirmation}
+                    className="mt-1.5 block font-bold text-[#C86D51] hover:underline"
+                  >
+                    Resend verification email →
+                  </button>
+                )}
+              </div>
             </div>
           )}
 
           {successMessage && (
             <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900 flex items-start gap-2 text-xs">
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-              <span>{successMessage}</span>
+              <div className="flex-1">
+                <span>{successMessage}</span>
+                {canResendConfirmation && (
+                  <button
+                    type="button"
+                    onClick={handleResendConfirmation}
+                    className="mt-1.5 block font-bold text-emerald-700 hover:underline"
+                  >
+                    Didn't receive email? Resend verification link
+                  </button>
+                )}
+              </div>
             </div>
           )}
 
@@ -163,7 +236,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMo
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    placeholder="e.g. Aanya Sharma"
+                    placeholder="e.g. Sarah Jenkins"
                     className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-[#DDD5CB] text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1A1A1A]"
                   />
                 </div>
@@ -180,29 +253,45 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMo
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@campus.ac.in"
+                  placeholder="name@example.com"
                   className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-[#DDD5CB] text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1A1A1A]"
                   required
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-[#1A1A1A] mb-1">
-                Password *
-              </label>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-[#8C7E6D] absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="At least 6 characters"
-                  className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-[#DDD5CB] text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1A1A1A]"
-                  required
-                />
+            {mode !== 'forgot' && (
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-semibold text-[#1A1A1A]">
+                    Password *
+                  </label>
+                  {mode === 'signin' && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMode('forgot');
+                        setAuthModalMode('forgot');
+                      }}
+                      className="text-[11px] text-[#C86D51] hover:underline"
+                    >
+                      Forgot password?
+                    </button>
+                  )}
+                </div>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-[#8C7E6D] absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="At least 6 characters"
+                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-[#DDD5CB] text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1A1A1A]"
+                    required
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             {mode === 'signup' && (
               <label className="flex items-start gap-2.5 text-xs text-[#5C5245] cursor-pointer bg-[#FAF8F5] p-3 rounded-xl border border-[#EAE3D8]">
@@ -213,7 +302,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMo
                   className="accent-[#C86D51] mt-0.5 rounded"
                 />
                 <span>
-                  <strong>Sync Guest Data:</strong> Automatically copy my current local demo wardrobe items, saved looks, and calendar schedules into my new cloud account.
+                  <strong>Sync Guest Wardrobe:</strong> Automatically migrate items, saved looks, and calendar schedules into your permanent cloud account.
                 </span>
               </label>
             )}
@@ -230,41 +319,73 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMo
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-4 h-4 text-[#E07A5F]" />
-                  <span>{mode === 'signin' ? 'Sign In to Cloud' : 'Create Cloud Account'}</span>
+                  {mode === 'signin' && (
+                    <>
+                      <Sparkles className="w-4 h-4 text-[#E07A5F]" />
+                      <span>Sign In to Cloud</span>
+                    </>
+                  )}
+                  {mode === 'signup' && (
+                    <>
+                      <Sparkles className="w-4 h-4 text-[#E07A5F]" />
+                      <span>Create Cloud Account</span>
+                    </>
+                  )}
+                  {mode === 'forgot' && (
+                    <>
+                      <KeyRound className="w-4 h-4 text-[#E07A5F]" />
+                      <span>Send Reset Link</span>
+                    </>
+                  )}
                 </>
               )}
             </button>
           </form>
 
-          {/* Toggle between Sign In and Sign Up */}
-          <div className="pt-2 text-center text-xs text-[#6B5E50]">
-            {mode === 'signin' ? (
+          {/* Toggle between Sign In, Sign Up, and Forgot Password */}
+          <div className="pt-2 text-center text-xs text-[#6B5E50] space-y-1">
+            {mode === 'signin' && (
               <p>
                 Don't have a cloud account yet?{' '}
                 <button
                   type="button"
                   onClick={() => {
                     setMode('signup');
-                    setErrorMessage(null);
+                    setAuthModalMode('signup');
                   }}
                   className="font-bold text-[#C86D51] hover:underline ml-1"
                 >
                   Create one now
                 </button>
               </p>
-            ) : (
+            )}
+            {mode === 'signup' && (
               <p>
                 Already have an account?{' '}
                 <button
                   type="button"
                   onClick={() => {
                     setMode('signin');
-                    setErrorMessage(null);
+                    setAuthModalMode('signin');
                   }}
                   className="font-bold text-[#C86D51] hover:underline ml-1"
                 >
                   Sign in here
+                </button>
+              </p>
+            )}
+            {mode === 'forgot' && (
+              <p>
+                Remembered your password?{' '}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode('signin');
+                    setAuthModalMode('signin');
+                  }}
+                  className="font-bold text-[#C86D51] hover:underline ml-1"
+                >
+                  Back to Sign In
                 </button>
               </p>
             )}

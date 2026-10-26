@@ -13,10 +13,10 @@ import {
 } from 'lucide-react';
 
 export const ContactPage: React.FC = () => {
-  const { submitFeedback, feedbackList, showToast } = useApp();
+  const { submitFeedback, feedbackList, showToast, currentUser } = useApp();
 
-  const [name, setName] = useState('Aanya Sharma');
-  const [email, setEmail] = useState('aanya.sharma@campus.ac.in');
+  const [name, setName] = useState(currentUser?.fullName || '');
+  const [email, setEmail] = useState(currentUser?.email || '');
   const [category, setCategory] = useState<'Stylist Feedback' | 'Feature Request' | 'Catalogue Bug' | 'Business Inquiry' | 'General'>('Stylist Feedback');
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -61,10 +61,10 @@ export const ContactPage: React.FC = () => {
           <span>Customer Experience & Feedback Loop</span>
         </div>
         <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-[#1A1A1A]">
-          Contact & Evaluation Feedback
+          Concierge Support & Feedback
         </h1>
         <p className="text-xs sm:text-sm text-[#6B5E50] leading-relaxed">
-          Have observations, bug reports, or partnership ideas for StyleSync? Submit your thoughts below; all responses persist in LocalStorage for demo evaluation.
+          Have observations, styling requests, or partnership ideas for StyleSync? Submit your thoughts below; our team reviews all inquiries within 4 business hours.
         </p>
       </div>
 
@@ -76,7 +76,7 @@ export const ContactPage: React.FC = () => {
               Send Us Your Thoughts
             </h2>
             <p className="text-xs text-[#8C7E6D] mt-0.5">
-              Managed under the Customer Experience department protocol.
+              Direct connection to StyleSync Product & Concierge Specialists.
             </p>
           </div>
 
@@ -84,7 +84,7 @@ export const ContactPage: React.FC = () => {
             <div className="p-4 rounded-2xl bg-[#F4F9F5] border border-emerald-200 text-emerald-950 flex items-center gap-3 animate-in fade-in">
               <CheckCircle2 className="w-5 h-5 text-emerald-700 shrink-0" />
               <div className="text-xs">
-                <strong>Feedback recorded successfully!</strong> Your response has been written into local demonstration storage.
+                <strong>Feedback recorded successfully!</strong> Thank you for helping us elevate the StyleSync wardrobe experience.
               </div>
             </div>
           )}
@@ -118,7 +118,7 @@ export const ContactPage: React.FC = () => {
                   className={`w-full px-3.5 py-2.5 rounded-xl border text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none ${
                     errors.email ? 'border-rose-400' : 'border-[#DDD5CB]'
                   }`}
-                  placeholder="name@campus.ac.in"
+                  placeholder="name@example.com"
                 />
                 {errors.email && <p className="text-[10px] text-rose-600 mt-1">{errors.email}</p>}
               </div>
@@ -137,7 +137,7 @@ export const ContactPage: React.FC = () => {
                 <option value="Feature Request">New Feature Request</option>
                 <option value="Catalogue Bug">Product Catalogue Bug</option>
                 <option value="Business Inquiry">Brand Partnership / Business Inquiry</option>
-                <option value="General">General Inquiries / Coursework Evaluation</option>
+                <option value="General">General Inquiries / Concierge Styling</option>
               </select>
             </div>
 
@@ -152,7 +152,7 @@ export const ContactPage: React.FC = () => {
                 className={`w-full px-3.5 py-2.5 rounded-xl border text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none ${
                   errors.message ? 'border-rose-400' : 'border-[#DDD5CB]'
                 }`}
-                placeholder="Share your thoughts on the outfit suggestions, UI experience, or business plan feasibility..."
+                placeholder="Share your thoughts on the outfit suggestions, UI experience, or brand partnership ideas..."
               />
               {errors.message && <p className="text-[10px] text-rose-600 mt-1">{errors.message}</p>}
             </div>
@@ -168,35 +168,35 @@ export const ContactPage: React.FC = () => {
           </form>
         </div>
 
-        {/* Right: Project Office Info & Saved Submissions Log */}
+        {/* Right: Studio Concierge Info & Saved Submissions Log */}
         <div className="lg:col-span-5 space-y-6">
           <div className="bg-[#FAF8F5] rounded-3xl p-6 sm:p-7 border border-[#EAE3D8] space-y-4">
             <h3 className="font-serif text-lg font-bold text-[#1A1A1A]">
-              Project Information
+              StyleSync Studio & Concierge
             </h3>
 
             <div className="space-y-3 text-xs text-[#5C5245]">
               <div className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-[#C86D51] shrink-0 mt-0.5" />
                 <div>
-                  <strong className="text-[#1A1A1A] block">Academic Institution:</strong>
-                  Department of Management Studies, University Campus
+                  <strong className="text-[#1A1A1A] block">Innovation Studio:</strong>
+                  StyleSync Technologies, Bengaluru & Mumbai
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
                 <Mail className="w-4 h-4 text-[#C86D51] shrink-0 mt-0.5" />
                 <div>
-                  <strong className="text-[#1A1A1A] block">Project Inquiries:</strong>
-                  stylesync.ai.project@gmail.com
+                  <strong className="text-[#1A1A1A] block">Direct Concierge:</strong>
+                  concierge@stylesync.fashion
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
                 <Clock className="w-4 h-4 text-[#C86D51] shrink-0 mt-0.5" />
                 <div>
-                  <strong className="text-[#1A1A1A] block">Course Evaluation Window:</strong>
-                  Autumn Academic Semester 2026
+                  <strong className="text-[#1A1A1A] block">Concierge Hours:</strong>
+                  Monday – Saturday, 9:00 AM – 7:00 PM IST
                 </div>
               </div>
             </div>
@@ -209,12 +209,12 @@ export const ContactPage: React.FC = () => {
                 <List className="w-4 h-4 text-[#C86D51]" />
                 Recent Feedback Submissions ({feedbackList.length})
               </h4>
-              <span className="text-[10px] text-[#8C7E6D]">Saved locally</span>
+              <span className="text-[10px] text-[#8C7E6D]">Active Records</span>
             </div>
 
             {feedbackList.length === 0 ? (
               <p className="text-xs text-[#8C7E6D] italic">
-                No submissions yet. Test the form above to record your evaluator feedback!
+                No submissions yet. Submit feedback above to share your styling thoughts!
               </p>
             ) : (
               <div className="space-y-2.5 max-h-56 overflow-y-auto pr-1">

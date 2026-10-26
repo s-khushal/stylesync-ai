@@ -11,17 +11,18 @@ export const CheckoutModal: React.FC = () => {
     clearCart, 
     showToast, 
     navigateTo,
-    recordCheckoutOrder 
+    recordCheckoutOrder,
+    currentUser
   } = useApp();
 
   const [formData, setFormData] = useState({
-    fullName: 'Aanya Sharma',
-    email: 'aanya.sharma@campus.ac.in',
-    phone: '9876543210',
-    address: 'Room 304, Kaveri Hostel, North Campus',
-    city: 'New Delhi',
-    pinCode: '110007',
-    paymentMethod: 'cod' // 'cod' | 'demo_upi'
+    fullName: currentUser?.fullName || '',
+    email: currentUser?.email || '',
+    phone: '',
+    address: '',
+    city: '',
+    pinCode: '',
+    paymentMethod: 'cod' // 'cod' | 'upi'
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -35,7 +36,7 @@ export const CheckoutModal: React.FC = () => {
     if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
     if (!formData.email.trim() || !/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Valid email is required';
     if (!formData.phone.trim() || formData.phone.length < 10) newErrors.phone = 'Valid 10-digit mobile number required';
-    if (!formData.address.trim()) newErrors.address = 'Campus or residential address is required';
+    if (!formData.address.trim()) newErrors.address = 'Delivery address is required';
     if (!formData.city.trim()) newErrors.city = 'City is required';
     if (!formData.pinCode.trim() || formData.pinCode.length < 6) newErrors.pinCode = '6-digit PIN code required';
     setErrors(newErrors);
@@ -49,12 +50,12 @@ export const CheckoutModal: React.FC = () => {
       return;
     }
 
-    const demoOrderId = `SSAI-${Math.floor(100000 + Math.random() * 900000)}`;
-    setConfirmedOrderId(demoOrderId);
+    const orderId = `SS-${Math.floor(100000 + Math.random() * 900000)}`;
+    setConfirmedOrderId(orderId);
     setOrderConfirmed(true);
 
     recordCheckoutOrder({
-      orderNumber: demoOrderId,
+      orderNumber: orderId,
       fullName: formData.fullName,
       email: formData.email,
       phone: formData.phone,
@@ -67,7 +68,7 @@ export const CheckoutModal: React.FC = () => {
     });
 
     clearCart();
-    showToast(`Order #${demoOrderId} placed successfully!`, 'success');
+    showToast(`Order #${orderId} placed successfully!`, 'success');
   };
 
   const handleClose = () => {
@@ -85,10 +86,10 @@ export const CheckoutModal: React.FC = () => {
         <div className="p-5 md:p-6 border-b border-[#EFECE6] flex items-center justify-between bg-[#FAF8F5]">
           <div>
             <h2 className="font-serif text-xl font-bold text-[#1A1A1A]">
-              {orderConfirmed ? 'Order Confirmation' : 'Demo Express Checkout'}
+              {orderConfirmed ? 'Order Confirmation' : 'Express Checkout'}
             </h2>
             <p className="text-xs text-[#8C7E6D]">
-              {orderConfirmed ? 'Thank you for testing the StyleSync flow' : 'No payment credentials will be requested or processed'}
+              {orderConfirmed ? 'Your capsule items are reserved' : 'Complimentary shipping & 100% verified order processing'}
             </p>
           </div>
           <button
@@ -108,13 +109,13 @@ export const CheckoutModal: React.FC = () => {
 
             <div>
               <span className="text-xs uppercase font-bold tracking-widest text-[#C86D51] bg-[#FDF8F5] px-3 py-1 rounded-full border border-[#F3E2D8]">
-                Demo Order Placed Successfully
+                Order Confirmed
               </span>
               <h3 className="font-serif text-2xl font-bold text-[#1A1A1A] mt-3">
                 Order #{confirmedOrderId}
               </h3>
               <p className="text-xs text-[#5C5245] max-w-md mx-auto mt-2 leading-relaxed">
-                Your simulated demo order has been logged. An email confirmation has been modeled for <strong className="text-[#1A1A1A]">{formData.email}</strong>.
+                Your capsule items have been reserved. Confirmation receipt and dispatch tracking have been dispatched to <strong className="text-[#1A1A1A]">{formData.email}</strong>.
               </p>
             </div>
 
@@ -130,7 +131,7 @@ export const CheckoutModal: React.FC = () => {
               <div className="flex justify-between text-[#8C7E6D]">
                 <span>Payment Mode:</span>
                 <span className="font-semibold text-[#1A1A1A]">
-                  {formData.paymentMethod === 'cod' ? 'Demo Cash on Delivery (Pay at Campus)' : 'Demo UPI Simulator'}
+                  {formData.paymentMethod === 'cod' ? 'Cash / UPI on Delivery' : 'Instant UPI Transfer'}
                 </span>
               </div>
               <div className="flex justify-between text-[#8C7E6D] pt-2 border-t border-[#EAE3D8]">
@@ -147,7 +148,7 @@ export const CheckoutModal: React.FC = () => {
                 }}
                 className="py-3 px-6 rounded-xl bg-[#1A1A1A] text-white text-xs font-semibold hover:bg-[#333333] transition-all flex items-center justify-center gap-2"
               >
-                Plan An Outfit For This Order <ArrowRight className="w-3.5 h-3.5" />
+                Schedule in Weekly Planner <ArrowRight className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={handleClose}
@@ -160,11 +161,11 @@ export const CheckoutModal: React.FC = () => {
         ) : (
           /* Form View */
           <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-5">
-            {/* Disclaimer Alert */}
+            {/* Guarantee Badge */}
             <div className="bg-[#FAF6F0] border border-[#E5DACD] rounded-2xl p-3.5 flex items-start gap-3 text-xs text-[#5C5245]">
-              <ShieldCheck className="w-5 h-5 text-[#C86D51] shrink-0 mt-0.5" />
+              <ShieldCheck className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
               <div>
-                <strong className="text-[#1A1A1A]">Academic Management Project Notice:</strong> This is a working prototype for the Essentials of Management business plan evaluation. No real financial credentials or payment gateways are used.
+                <strong className="text-[#1A1A1A]">StyleSync Guarantee:</strong> Verified high-quality natural fabrics, complimentary 7-day doorstep size exchanges, and 100% secure processing.
               </div>
             </div>
 
@@ -180,7 +181,7 @@ export const CheckoutModal: React.FC = () => {
                   className={`w-full px-3.5 py-2.5 rounded-xl border text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] ${
                     errors.fullName ? 'border-rose-400' : 'border-[#DDD5CB]'
                   }`}
-                  placeholder="e.g. Aanya Sharma"
+                  placeholder="e.g. Sarah Jenkins"
                 />
                 {errors.fullName && <p className="text-[10px] text-rose-600 mt-1">{errors.fullName}</p>}
               </div>
@@ -196,7 +197,7 @@ export const CheckoutModal: React.FC = () => {
                   className={`w-full px-3.5 py-2.5 rounded-xl border text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] ${
                     errors.email ? 'border-rose-400' : 'border-[#DDD5CB]'
                   }`}
-                  placeholder="name@campus.ac.in"
+                  placeholder="name@example.com"
                 />
                 {errors.email && <p className="text-[10px] text-rose-600 mt-1">{errors.email}</p>}
               </div>
@@ -212,7 +213,7 @@ export const CheckoutModal: React.FC = () => {
                   className={`w-full px-3.5 py-2.5 rounded-xl border text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] ${
                     errors.phone ? 'border-rose-400' : 'border-[#DDD5CB]'
                   }`}
-                  placeholder="10-digit phone"
+                  placeholder="10-digit mobile number"
                 />
                 {errors.phone && <p className="text-[10px] text-rose-600 mt-1">{errors.phone}</p>}
               </div>
@@ -228,14 +229,14 @@ export const CheckoutModal: React.FC = () => {
                   className={`w-full px-3.5 py-2.5 rounded-xl border text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] ${
                     errors.city ? 'border-rose-400' : 'border-[#DDD5CB]'
                   }`}
-                  placeholder="New Delhi, Mumbai, Bangalore..."
+                  placeholder="Mumbai, Bengaluru, Delhi, etc."
                 />
                 {errors.city && <p className="text-[10px] text-rose-600 mt-1">{errors.city}</p>}
               </div>
 
               <div className="sm:col-span-2">
                 <label className="block text-xs font-semibold text-[#1A1A1A] mb-1">
-                  Delivery Address (Campus Hostel or Home) *
+                  Delivery Address *
                 </label>
                 <input
                   type="text"
@@ -244,7 +245,7 @@ export const CheckoutModal: React.FC = () => {
                   className={`w-full px-3.5 py-2.5 rounded-xl border text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] ${
                     errors.address ? 'border-rose-400' : 'border-[#DDD5CB]'
                   }`}
-                  placeholder="Hostel, Flat No, Street, Landmark"
+                  placeholder="Flat / House No., Building, Street, Landmark"
                 />
                 {errors.address && <p className="text-[10px] text-rose-600 mt-1">{errors.address}</p>}
               </div>
@@ -260,22 +261,22 @@ export const CheckoutModal: React.FC = () => {
                   className={`w-full px-3.5 py-2.5 rounded-xl border text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1A1A1A] ${
                     errors.pinCode ? 'border-rose-400' : 'border-[#DDD5CB]'
                   }`}
-                  placeholder="6 digits PIN"
+                  placeholder="6-digit PIN code"
                 />
                 {errors.pinCode && <p className="text-[10px] text-rose-600 mt-1">{errors.pinCode}</p>}
               </div>
 
               <div>
                 <label className="block text-xs font-semibold text-[#1A1A1A] mb-1">
-                  Simulated Payment Method
+                  Payment Method
                 </label>
                 <select
                   value={formData.paymentMethod}
                   onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-[#DDD5CB] text-xs bg-[#FAF8F5] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#1A1A1A]"
                 >
-                  <option value="cod">Demo Pay-on-Delivery (Campus COD)</option>
-                  <option value="demo_upi">Demo UPI Simulator (Zero Charge)</option>
+                  <option value="cod">Cash / UPI on Delivery (Doorstep)</option>
+                  <option value="upi">Instant UPI simulator</option>
                 </select>
               </div>
             </div>
@@ -283,7 +284,7 @@ export const CheckoutModal: React.FC = () => {
             {/* Mini Summary */}
             <div className="pt-3 border-t border-[#EFECE6] flex items-center justify-between">
               <div>
-                <span className="text-[11px] text-[#8C7E6D]">Total Demo Payable</span>
+                <span className="text-[11px] text-[#8C7E6D]">Total Look Investment</span>
                 <div className="text-lg font-bold text-[#1A1A1A]">
                   ₹{cartSubtotal.toLocaleString('en-IN')}
                 </div>
@@ -293,7 +294,7 @@ export const CheckoutModal: React.FC = () => {
                 type="submit"
                 className="py-3 px-6 rounded-xl bg-[#1A1A1A] hover:bg-[#333333] text-white font-semibold text-xs tracking-wider uppercase transition-all shadow-md flex items-center gap-2"
               >
-                <ShoppingBag className="w-4 h-4" /> Place Demo Order
+                <ShoppingBag className="w-4 h-4" /> Place Confirmed Order
               </button>
             </div>
           </form>

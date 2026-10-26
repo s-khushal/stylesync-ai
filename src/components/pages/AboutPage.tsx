@@ -32,7 +32,7 @@ export const AboutPage: React.FC = () => {
           "Your Wardrobe. Your Style. Smarter Choices."
         </p>
         <p className="text-xs sm:text-sm text-[#7A6B5D] max-w-2xl mx-auto leading-relaxed">
-          Bridging the gap between chaotic physical closets and intelligent outfit coordination. Designed for Indian college students and young professionals seeking confidence without excessive spending.
+          Bridging the gap between chaotic physical closets and intelligent outfit coordination. Designed for young professionals, creative leaders, and conscious consumers seeking style confidence without excessive spending.
         </p>
       </div>
 
@@ -186,16 +186,16 @@ export const AboutPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 5. MVP Transparency Notice */}
+      {/* 5. Startup Roadmap & Scaling Architecture */}
       <div className="bg-[#1C1A18] text-white rounded-3xl p-8 sm:p-10 border border-[#38332E] shadow-xl space-y-4">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C86D51] text-white text-[11px] font-bold uppercase tracking-wider">
-          <ShieldCheck className="w-3.5 h-3.5" /> Academic MVP Disclosure
+          <ShieldCheck className="w-3.5 h-3.5" /> Technology Roadmap
         </div>
         <h3 className="font-serif text-2xl font-bold text-white">
-          Current Prototype vs. Future Roadmap
+          Product Architecture & Future Expansion
         </h3>
         <p className="text-xs sm:text-sm text-[#B5ABA0] leading-relaxed max-w-3xl">
-          The current website operates as a working Minimal Viable Product (MVP) designed for coursework evaluation in Essentials of Management. All purchases, pricing tags, and recommendations are simulated demonstrations using local algorithmic scoring. Future expansion phases will evaluate commercial retailer integrations and multimodal foundation AI models.
+          StyleSync is expanding its algorithmic curation with next-generation computer vision, automated silhouette background removal, and direct API partnerships with ethical fashion retailers. Our mission remains constant: helping users make intentional, high-confidence wardrobe decisions every single day.
         </p>
 
         <div className="pt-2 flex flex-wrap gap-4">
@@ -203,13 +203,13 @@ export const AboutPage: React.FC = () => {
             onClick={() => navigateTo('business-plan')}
             className="py-3 px-6 rounded-xl bg-white hover:bg-[#FAF8F5] text-[#1A1A1A] text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2"
           >
-            Review 6-Pillar Business Plan <ArrowRight className="w-3.5 h-3.5" />
+            Review Business Model <ArrowRight className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => navigateTo('team')}
             className="py-3 px-6 rounded-xl bg-[#2D2824] hover:bg-[#3D352E] text-white text-xs font-bold uppercase tracking-wider border border-[#4A423A] transition-all"
           >
-            Review 12-Person Org Chart
+            Meet Our Leadership Team
           </button>
         </div>
       </div>

@@ -138,7 +138,7 @@ export const CartModal: React.FC = () => {
             </div>
             <div className="flex items-center justify-between text-xs text-[#5C5245]">
               <span className="flex items-center gap-1">
-                Campus Delivery <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 rounded">FREE</span>
+                Estimated Delivery <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 rounded">COMPLIMENTARY</span>
               </span>
               <span className="font-semibold text-emerald-700">₹0</span>
             </div>
@@ -151,9 +151,9 @@ export const CartModal: React.FC = () => {
             </div>
 
             <div className="bg-[#FFFDF9] border border-[#E8DFC8] rounded-xl p-2.5 flex items-start gap-2 text-[11px] text-[#7A6B54]">
-              <ShieldCheck className="w-4 h-4 text-[#C86D51] shrink-0 mt-0.5" />
+              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
               <span>
-                <strong>Academic Prototype Notice:</strong> Transactions are simulated for Essentials of Management project evaluation.
+                <strong>Secure Checkout Guarantee:</strong> Encrypted order flow with complimentary doorstep exchange.
               </span>
             </div>
 
@@ -164,7 +164,7 @@ export const CartModal: React.FC = () => {
               }}
               className="w-full py-3 px-4 rounded-xl bg-[#1A1A1A] hover:bg-[#333333] text-white font-semibold text-xs tracking-wider uppercase transition-all shadow-md flex items-center justify-center gap-2"
             >
-              Proceed to Demo Checkout <ArrowRight className="w-4 h-4" />
+              Proceed to Express Checkout <ArrowRight className="w-4 h-4" />
             </button>
 
             <button

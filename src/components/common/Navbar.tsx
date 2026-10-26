@@ -18,7 +18,8 @@ import {
   MessageSquare,
   Cloud,
   LogOut,
-  LogIn
+  LogIn,
+  Palette
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -36,48 +37,63 @@ export const Navbar: React.FC = () => {
   } = useApp();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [businessDropdownOpen, setBusinessDropdownOpen] = useState(false);
+  const [companyDropdownOpen, setCompanyDropdownOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
   const handleNav = (page: PageId) => {
     navigateTo(page);
     setMobileMenuOpen(false);
-    setBusinessDropdownOpen(false);
+    setCompanyDropdownOpen(false);
     setUserDropdownOpen(false);
   };
 
   const navLinks: { label: string; page: PageId; icon: React.ReactNode }[] = [
+    { label: 'Discover', page: 'home', icon: <Compass className="w-4 h-4 text-[#C86D51]" /> },
     { label: 'AI Stylist', page: 'stylist', icon: <Sparkles className="w-4 h-4 text-[#C86D51]" /> },
-    { label: 'Discover', page: 'discover', icon: <Compass className="w-4 h-4" /> },
+    { label: 'Curated Shop', page: 'discover', icon: <ShoppingBag className="w-4 h-4" /> },
     { label: 'My Wardrobe', page: 'wardrobe', icon: <Layers className="w-4 h-4" /> },
-    { label: 'Outfit Builder', page: 'builder', icon: <Sparkles className="w-4 h-4" /> },
-    { label: 'Planner', page: 'planner', icon: <Calendar className="w-4 h-4" /> },
+    { label: 'Outfit Canvas', page: 'builder', icon: <Palette className="w-4 h-4" /> },
+    { label: 'Weekly Planner', page: 'planner', icon: <Calendar className="w-4 h-4" /> },
   ];
 
-  const businessLinks: { label: string; page: PageId; icon: React.ReactNode }[] = [
-    { label: 'Business Plan (6 Components)', page: 'business-plan', icon: <Briefcase className="w-4 h-4" /> },
-    { label: 'Team & Organization Chart', page: 'team', icon: <Users className="w-4 h-4" /> },
-    { label: 'About Startup', page: 'about', icon: <Info className="w-4 h-4" /> },
-    { label: 'Contact & Feedback', page: 'contact', icon: <MessageSquare className="w-4 h-4" /> },
+  const companyLinks: { label: string; page: PageId; icon: React.ReactNode }[] = [
+    { label: 'Our Philosophy', page: 'about', icon: <Info className="w-4 h-4 text-[#C86D51]" /> },
+    { label: 'Leadership & Team', page: 'team', icon: <Users className="w-4 h-4" /> },
+    { label: 'Business Model', page: 'business-plan', icon: <Briefcase className="w-4 h-4" /> },
+    { label: 'Concierge & Feedback', page: 'contact', icon: <MessageSquare className="w-4 h-4" /> },
   ];
 
-  const isBusinessActive = ['business-plan', 'team', 'about', 'contact'].includes(activePage);
+  const isCompanyActive = ['about', 'team', 'business-plan', 'contact'].includes(activePage);
 
   return (
     <header className="sticky top-0 z-40 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-[#EAE4DC] transition-all">
-      {/* Top Bar with Cloud Status indicator */}
-      <div className="bg-[#1A1A1A] text-[#EBE5DE] text-[11px] py-1.5 px-4 sm:px-6 lg:px-8 font-medium tracking-wide flex items-center justify-end">
-        {/* Cloud Status indicator in top bar */}
-        <div className="flex items-center gap-2">
+      {/* Top Startup Announcement Bar */}
+      <div className="bg-[#1A1A1A] text-[#EDE7DF] text-xs py-2 px-4 sm:px-8 border-b border-[#332C26] flex items-center justify-between">
+        <div className="flex items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap">
+          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#C86D51] text-white font-bold text-[10px] tracking-wider uppercase">
+            Early Access
+          </span>
+          <span className="hidden sm:inline text-[#D4C9BC] text-xs">
+            Experience algorithmic capsule wardrobe curation & personal styling.
+          </span>
+          <span className="sm:hidden text-[11px] text-[#D4C9BC]">
+            Smart Wardrobe & AI Styling Studio
+          </span>
+        </div>
+        <div className="flex items-center gap-4 text-[11px] text-[#B8ACA0] shrink-0">
+          <span className="inline-flex items-center gap-1.5 text-emerald-400 font-medium">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            Styling Studio Live
+          </span>
           {isCloudConnected ? (
-            <span className="inline-flex items-center gap-1.5 text-emerald-400 text-[10px] bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-800">
+            <span className="hidden md:inline-flex items-center gap-1 text-emerald-400 text-[10px] bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-800">
               <Cloud className="w-3 h-3 text-emerald-400" />
               <span>Supabase Cloud Connected</span>
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1.5 text-amber-300 text-[10px] bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-800">
+            <span className="hidden md:inline-flex items-center gap-1 text-amber-300 text-[10px] bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-800">
               <Cloud className="w-3 h-3 text-amber-400" />
-              <span>Local Demo Mode (Guest)</span>
+              <span>Guest Session</span>
             </span>
           )}
         </div>
@@ -88,23 +104,23 @@ export const Navbar: React.FC = () => {
         {/* Brand Logo */}
         <div 
           onClick={() => handleNav('home')} 
-          className="cursor-pointer flex items-center gap-2.5 group"
+          className="cursor-pointer flex items-center gap-3 group"
         >
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1A1A1A] to-[#38332E] flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
-            <span className="font-serif text-xl italic font-bold">S</span>
+            <span className="font-serif text-2xl italic font-bold">S</span>
           </div>
           <div className="flex flex-col">
             <span className="font-serif text-2xl font-bold tracking-tight text-[#1A1A1A] leading-tight">
               StyleSync
             </span>
-            <span className="text-[10px] tracking-wider text-[#8C7E6D] uppercase font-medium">
+            <span className="text-[10px] tracking-wider text-[#8C7E6D] uppercase font-semibold">
               Your Wardrobe. Your Style. Smarter Choices.
             </span>
           </div>
         </div>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
+        <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5">
           {navLinks.map((link) => {
             const isActive = activePage === link.page;
             return (
@@ -123,30 +139,29 @@ export const Navbar: React.FC = () => {
             );
           })}
 
-          {/* Business & College Project Dropdown */}
+          {/* Company Dropdown */}
           <div className="relative">
             <button
-              onClick={() => setBusinessDropdownOpen(!businessDropdownOpen)}
+              onClick={() => setCompanyDropdownOpen(!companyDropdownOpen)}
               className={`px-3 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-1.5 ${
-                isBusinessActive
+                isCompanyActive
                   ? 'bg-white text-[#C86D51] shadow-sm border border-[#E2DAD0] font-semibold'
                   : 'text-[#5C5245] hover:text-[#1A1A1A] hover:bg-[#F3EFE8]'
               }`}
             >
-              <Briefcase className="w-4 h-4 text-[#C86D51]" />
-              <span>Project & Strategy</span>
+              <span>Company</span>
               <ChevronDown className="w-3.5 h-3.5 opacity-70" />
             </button>
 
-            {businessDropdownOpen && (
+            {companyDropdownOpen && (
               <div 
-                className="absolute top-full right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-[#EDE8E0] p-2 py-2.5 z-50 animate-in fade-in slide-in-from-top-2"
-                onMouseLeave={() => setBusinessDropdownOpen(false)}
+                className="absolute top-full right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-[#EDE8E0] p-2 z-50 animate-in fade-in slide-in-from-top-2"
+                onMouseLeave={() => setCompanyDropdownOpen(false)}
               >
                 <div className="px-3 py-1.5 text-[10px] uppercase font-bold tracking-wider text-[#9E9080] border-b border-[#F5F2EB] mb-1">
-                  Management Course Components
+                  StyleSync Ecosystem
                 </div>
-                {businessLinks.map((item) => (
+                {companyLinks.map((item) => (
                   <button
                     key={item.page}
                     onClick={() => handleNav(item.page)}
@@ -167,7 +182,7 @@ export const Navbar: React.FC = () => {
 
         {/* Right Action Icons (Favourites, Cart, Profile/Auth, Mobile Menu) */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Favourites */}
+          {/* Favourites / Wishlist */}
           <button
             onClick={() => handleNav('profile')}
             aria-label="Favourites"
@@ -195,15 +210,15 @@ export const Navbar: React.FC = () => {
             </span>
           </button>
 
-          {/* Authentication & User Dropdown */}
+          {/* Authentication & User Badge */}
           {currentUser ? (
             <div className="relative">
               <button
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                 className="flex items-center gap-2 py-1.5 px-3 rounded-xl bg-[#FAF6F0] hover:bg-[#F3ECE4] border border-[#E2DAD0] text-[#1A1A1A] transition-all text-xs font-semibold"
               >
-                <div className="w-6 h-6 rounded-full bg-[#1A1A1A] text-white flex items-center justify-center text-[10px] font-bold">
-                  {currentUser.fullName?.charAt(0) || currentUser.email.charAt(0).toUpperCase()}
+                <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-[#C86D51] to-[#E07A5F] text-white flex items-center justify-center text-[10px] font-bold">
+                  {currentUser.fullName ? currentUser.fullName.charAt(0).toUpperCase() : currentUser.email.charAt(0).toUpperCase()}
                 </div>
                 <span className="hidden md:inline max-w-[100px] truncate">
                   {currentUser.fullName || currentUser.email.split('@')[0]}
@@ -217,14 +232,14 @@ export const Navbar: React.FC = () => {
                   onMouseLeave={() => setUserDropdownOpen(false)}
                 >
                   <div className="px-3 py-2 border-b border-[#F5F2EB]">
-                    <p className="text-xs font-bold text-[#1A1A1A] truncate">{currentUser.fullName || 'User'}</p>
+                    <p className="text-xs font-bold text-[#1A1A1A] truncate">{currentUser.fullName || 'Member'}</p>
                     <p className="text-[10px] text-[#8C7E6D] truncate">{currentUser.email}</p>
                   </div>
                   <button
                     onClick={() => handleNav('profile')}
                     className="w-full text-left px-3 py-2 text-xs text-[#4A4237] hover:bg-[#FAF8F5] rounded-xl flex items-center gap-2 mt-1"
                   >
-                    <User className="w-4 h-4 text-[#C86D51]" /> Dashboard & Profile
+                    <User className="w-4 h-4 text-[#C86D51]" /> Dashboard & Wardrobe
                   </button>
                   <button
                     onClick={() => {
@@ -239,31 +254,29 @@ export const Navbar: React.FC = () => {
               )}
             </div>
           ) : (
-            <button
-              onClick={() => {
-                setAuthModalMode('signin');
-                setIsAuthModalOpen(true);
-              }}
-              className="hidden sm:flex items-center gap-1.5 py-2 px-3 rounded-xl border border-[#DDD5CB] hover:bg-[#FAF8F5] text-[#1A1A1A] text-xs font-semibold transition-all shadow-sm"
-            >
-              <LogIn className="w-3.5 h-3.5 text-[#C86D51]" />
-              <span>Sign In</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  setAuthModalMode('signin');
+                  setIsAuthModalOpen(true);
+                }}
+                className="hidden sm:flex items-center gap-1.5 py-2 px-3 rounded-xl border border-[#DDD5CB] hover:bg-[#FAF8F5] text-[#1A1A1A] text-xs font-semibold transition-all shadow-sm"
+              >
+                <LogIn className="w-3.5 h-3.5 text-[#C86D51]" />
+                <span>Sign In</span>
+              </button>
+              <button
+                onClick={() => {
+                  setAuthModalMode('signup');
+                  setIsAuthModalOpen(true);
+                }}
+                className="hidden md:flex items-center gap-1.5 py-2 px-3 rounded-xl bg-[#1A1A1A] hover:bg-[#333333] text-white text-xs font-semibold transition-all shadow-sm"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#E07A5F]" />
+                <span>Get Started</span>
+              </button>
+            </div>
           )}
-
-          {/* Profile Quick Link */}
-          <button
-            onClick={() => handleNav('profile')}
-            aria-label="User Profile"
-            className={`p-2.5 rounded-xl transition-colors ${
-              activePage === 'profile'
-                ? 'bg-white shadow-sm border border-[#E2DAD0] text-[#C86D51]'
-                : 'text-[#4A4237] hover:bg-[#F0EBE2]'
-            }`}
-            title="My Dashboard & Profile"
-          >
-            <User className="w-5 h-5" />
-          </button>
 
           {/* Mobile menu trigger */}
           <button
@@ -286,7 +299,7 @@ export const Navbar: React.FC = () => {
                 <div>
                   <p className="text-xs font-bold text-[#1A1A1A]">{currentUser.fullName || currentUser.email}</p>
                   <p className="text-[10px] text-emerald-700 flex items-center gap-1">
-                    <Cloud className="w-3 h-3" /> Cloud Synced
+                    <Cloud className="w-3 h-3" /> Cloud Member
                   </p>
                 </div>
                 <button
@@ -301,9 +314,10 @@ export const Navbar: React.FC = () => {
               </div>
             ) : (
               <div className="flex items-center justify-between w-full">
-                <span className="text-xs text-[#6B5E50]">Guest / Local Demo Mode</span>
+                <span className="text-xs text-[#6B5E50]">Welcome to StyleSync</span>
                 <button
                   onClick={() => {
+                    setAuthModalMode('signin');
                     setIsAuthModalOpen(true);
                     setMobileMenuOpen(false);
                   }}
@@ -337,9 +351,9 @@ export const Navbar: React.FC = () => {
 
           <div className="border-t border-[#EAE3D8] pt-3 space-y-1">
             <div className="px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-[#8C7E6D]">
-              Management Project & Strategy
+              Company & Philosophy
             </div>
-            {businessLinks.map((item) => (
+            {companyLinks.map((item) => (
               <button
                 key={item.page}
                 onClick={() => handleNav(item.page)}
