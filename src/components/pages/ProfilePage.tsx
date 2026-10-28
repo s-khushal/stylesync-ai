@@ -235,9 +235,9 @@ export const ProfilePage: React.FC = () => {
                 </div>
                 <input
                   type="range"
-                  min="2000"
-                  max="10000"
-                  step="500"
+                  min="800"
+                  max="4000"
+                  step="100"
                   value={budgetMax}
                   onChange={(e) => setBudgetMax(Number(e.target.value))}
                   className="w-full accent-[#C86D51]"

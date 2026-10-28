@@ -22,7 +22,7 @@ export const StylistPage: React.FC = () => {
   // Criteria state
   const [occasion, setOccasion] = useState<OccasionTag>('Casual outing');
   const [style, setStyle] = useState<StyleTag>('Smart casual');
-  const [budgetMax, setBudgetMax] = useState<number>(6500);
+  const [budgetMax, setBudgetMax] = useState<number>(2500);
   const [preferredColors, setPreferredColors] = useState<string[]>(['Ivory', 'Terracotta', 'Beige']);
   const [season, setSeason] = useState<SeasonTag>('All-Season');
   const [includeCategories, setIncludeCategories] = useState({
@@ -48,7 +48,7 @@ export const StylistPage: React.FC = () => {
     const initialCriteria: StylistCriteria = {
       occasion: 'Casual outing',
       style: 'Smart casual',
-      budgetMax: 6500,
+      budgetMax: 2500,
       preferredColors: ['Ivory', 'Terracotta', 'Beige'],
       season: 'All-Season',
       includeCategories: {
@@ -294,17 +294,17 @@ export const StylistPage: React.FC = () => {
             </div>
             <input
               type="range"
-              min="2000"
-              max="15000"
-              step="500"
+              min="800"
+              max="4000"
+              step="100"
               value={budgetMax}
               onChange={(e) => setBudgetMax(Number(e.target.value))}
               className="w-full accent-[#C86D51] cursor-pointer"
             />
             <div className="flex justify-between text-[10px] text-[#8C7E6D] mt-1 font-medium">
-              <span>₹2,000 (Smart Value)</span>
-              <span>₹8,500</span>
-              <span>₹15,000 (Luxury Ensemble)</span>
+              <span>₹800 (Everyday Budget)</span>
+              <span>₹2,400</span>
+              <span>₹4,000 (Complete Occasion Ensemble)</span>
             </div>
           </div>
 

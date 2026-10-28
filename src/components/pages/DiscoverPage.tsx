@@ -13,7 +13,7 @@ export const DiscoverPage: React.FC = () => {
   const [selectedOccasion, setSelectedOccasion] = useState<OccasionTag | 'All'>('All');
   const [selectedStyle, setSelectedStyle] = useState<StyleTag | 'All'>('All');
   const [selectedColor, setSelectedColor] = useState<string>('All');
-  const [priceMax, setPriceMax] = useState<number>(5000);
+  const [priceMax, setPriceMax] = useState<number>(2000);
   const [sortBy, setSortBy] = useState<'relevance' | 'price-asc' | 'price-desc' | 'rating'>('relevance');
 
   // Sync with global search query when it changes
@@ -126,11 +126,11 @@ export const DiscoverPage: React.FC = () => {
     setSelectedOccasion('All');
     setSelectedStyle('All');
     setSelectedColor('All');
-    setPriceMax(5000);
+    setPriceMax(2000);
     setSortBy('relevance');
   };
 
-  const isFiltered = searchTerm !== '' || selectedCategory !== 'All' || selectedOccasion !== 'All' || selectedStyle !== 'All' || selectedColor !== 'All' || priceMax < 5000;
+  const isFiltered = searchTerm !== '' || selectedCategory !== 'All' || selectedOccasion !== 'All' || selectedStyle !== 'All' || selectedColor !== 'All' || priceMax < 2000;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
@@ -269,9 +269,9 @@ export const DiscoverPage: React.FC = () => {
             </div>
             <input
               type="range"
-              min="800"
-              max="5000"
-              step="100"
+              min="300"
+              max="2000"
+              step="50"
               value={priceMax}
               onChange={(e) => setPriceMax(Number(e.target.value))}
               className="w-full accent-[#C86D51] cursor-pointer"

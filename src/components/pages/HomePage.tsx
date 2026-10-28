@@ -38,7 +38,7 @@ const CURATED_LOOKS: CuratedLook[] = [
     badge: 'Tailored Ease',
     title: 'Structured Sand Blazer & Ivory Knit',
     desc: 'Relaxed double-breasted silhouette balanced with breathable ribbed knit and tapered wool trousers.',
-    price: '₹6,890',
+    price: '₹2,450',
     score: '98% Fit Score',
     image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80'
   },
@@ -49,7 +49,7 @@ const CURATED_LOOKS: CuratedLook[] = [
     badge: 'Weekend Casual',
     title: 'Warm Ochre & Relaxed Ecru Denim',
     desc: 'Effortless sunshine tone layered over high-waisted ecru wide-leg jeans with minimal leather slides.',
-    price: '₹4,450',
+    price: '₹1,590',
     score: '95% Fit Score',
     image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80'
   },
@@ -60,7 +60,7 @@ const CURATED_LOOKS: CuratedLook[] = [
     badge: 'Evening Sleek',
     title: 'Charcoal Wool Long Coat & Heeled Boots',
     desc: 'Monochrome elegance with sharp lapels, brushed brass jewelry accents, and structured leather crossbody bag.',
-    price: '₹8,990',
+    price: '₹2,990',
     score: '97% Fit Score',
     image: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=800&q=80'
   },
@@ -71,7 +71,7 @@ const CURATED_LOOKS: CuratedLook[] = [
     badge: 'Resort Minimal',
     title: 'Organic Linen Co-Ord & Woven Tote',
     desc: 'Breezy natural fibers in terracotta and sand hues engineered for tropical getaways and seaside afternoons.',
-    price: '₹5,200',
+    price: '₹1,850',
     score: '93% Fit Score',
     image: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=800&q=80'
   },
@@ -82,7 +82,7 @@ const CURATED_LOOKS: CuratedLook[] = [
     badge: 'Quiet Luxury',
     title: 'Camel Wool Trench & Silk Slip',
     desc: 'Timeless outerwear over flowing midi silk, paired with handcrafted leather mules and structured eyewear.',
-    price: '₹9,450',
+    price: '₹3,250',
     score: '99% Fit Score',
     image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=800&q=80'
   },
@@ -93,7 +93,7 @@ const CURATED_LOOKS: CuratedLook[] = [
     badge: 'City Streetwear',
     title: 'Clean Neutral Streetwear Set',
     desc: 'Boxy crewneck fleece combined with relaxed utility cargo pants and vintage white leather runners.',
-    price: '₹3,890',
+    price: '₹1,490',
     score: '92% Fit Score',
     image: 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=800&q=80'
   }

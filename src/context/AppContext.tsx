@@ -22,8 +22,8 @@ const EMPTY_PROFILE: UserProfile = {
   bio: '',
   preferredStyles: ['Minimalist', 'Smart casual'],
   favoriteColors: ['Ivory', 'Terracotta', 'Charcoal'],
-  budgetMin: 1500,
-  budgetMax: 6000,
+  budgetMin: 500,
+  budgetMax: 2500,
   preferredOccasions: ['Casual outing', 'Formal meeting', 'Party']
 };
 
